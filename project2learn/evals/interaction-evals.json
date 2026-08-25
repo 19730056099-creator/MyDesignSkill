@@ -1,0 +1,78 @@
+{
+  "skill_name": "project2learn",
+  "evals": [
+    {
+      "id": 4,
+      "prompt": "这是我上次 Project2Learn 的 progress.json。请继续学习，不要重新分析整个仓库。先告诉我当前阶段、尚未完成的目标和下一步动作，并给出中英文阶段文件路径。",
+      "expected_output": "The tutor resumes milestone 2 from shared state, avoids regenerating the course, and reports one concrete next action plus both localized paths.",
+      "files": ["evals/fixtures/session/progress.json"],
+      "expectations": [
+        "The response identifies milestone 2 as current.",
+        "The response does not restart repository analysis without a revision mismatch.",
+        "The response names both zh-CN and en milestone paths.",
+        "The response ends with one observable next action."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "模拟两轮辅导：第一轮我只说‘我卡住了’，你应先给最低级提示；第二轮我明确说‘给我伪代码’，你应跳到对应级别。展示两轮回复以及应追加到 hint_history 的语言无关记录。不要提前贴完整参考实现。",
+      "expected_output": "A two-turn transcript that starts at Hint 1, jumps to Hint 4 on explicit request, and records both events without revealing Hint 5.",
+      "files": ["evals/fixtures/session/progress.json"],
+      "expectations": [
+        "Turn one uses Hint 1 observation guidance.",
+        "Turn two uses Hint 4 pseudocode after the explicit request.",
+        "hint_history records milestone-02 with levels 1 and 4, reasons, and timestamps.",
+        "No complete reference implementation is shown."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "评审一个里程碑 2 的学生实现：它达到了命令行 add/list 的验收，但提前加入了 JSON 持久化。请按当前阶段标准判断哪些部分通过、哪些违反了阶段约束；同时生成中英文评审结构，保持 review_id、milestone_id、验收证据和 verdict 一致，并说明 progress.json 应如何迁移。",
+      "expected_output": "A stage-aware bilingual review that recognizes passing behavior, flags premature persistence against the milestone constraint, uses matching metadata, and chooses a justified state transition.",
+      "files": [
+        "evals/fixtures/session/progress.json",
+        "evals/fixtures/python-cli/app.py"
+      ],
+      "expectations": [
+        "The review judges against milestone 2 rather than the final project architecture.",
+        "Strengths and the premature-persistence constraint violation are both explained.",
+        "Chinese and English reviews share review_id, milestone_id, evidence, and verdict.",
+        "The proposed progress transition follows the tutor-and-review protocol."
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "我想把这个项目变成 Project2Learn 课程，但我没有说明自己会不会 Python、终端、Git 或测试。请展示新流程在真正制定个性化路线前应该怎么处理：只根据项目实际用到的能力问我，别先生成完整课程，也别问泛泛的初级/中级。",
+      "expected_output": "A bounded readiness interaction that keeps the course analyzing, offers assume-beginner/calibration/waiver choices, and asks only a short project-specific capability question set before route finalization.",
+      "files": [
+        "evals/fixtures/python-cli/README.md",
+        "evals/fixtures/python-cli/app.py",
+        "evals/fixtures/python-cli/test_app.py"
+      ],
+      "expectations": [
+        "The response does not claim the learner is ready for milestone 1.",
+        "It offers assume_beginner, a short calibration, and explicit waiver with risk.",
+        "It asks capability-based questions only about prerequisites used by the selected Python CLI path.",
+        "It keeps course_status analyzing, learning_phase assessing, current_unit readiness, and current_milestone 0."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "我完全不会这个 Go 项目用到的技术，别测试我，直接按零基础处理。但不要让我先学一整套 Go 和网络编程课程，只安排完成这个 TCP KV 项目需要的前置内容，并说明为什么学习顺序是这样。",
+      "expected_output": "An assume-beginner readiness decision with a topologically ordered, just-enough foundation route linked to project milestones and no generic full-course detour.",
+      "files": [
+        "evals/fixtures/infra-loop/README.md",
+        "evals/fixtures/infra-loop/go.mod",
+        "evals/fixtures/infra-loop/main.go",
+        "evals/fixtures/infra-loop/protocol.go",
+        "evals/fixtures/infra-loop/protocol_test.go"
+      ],
+      "expectations": [
+        "The learner's no-quiz request is honored as assessment_mode assume_beginner.",
+        "The prerequisite route includes transitive dependencies and is ordered before the first milestone that requires them.",
+        "Each foundation is linked to competency IDs and required_by milestone IDs.",
+        "The response explicitly excludes unrelated Go and networking syllabus content."
+      ]
+    }
+  ]
+}

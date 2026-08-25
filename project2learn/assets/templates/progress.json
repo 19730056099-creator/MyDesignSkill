@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "repository": {
+    "name": "",
+    "source": "",
+    "revision": ""
+  },
+  "course_status": "analyzing",
+  "learning_phase": "assessing",
+  "current_unit": {
+    "kind": "assessment",
+    "id": "readiness"
+  },
+  "current_milestone": 0,
+  "learner_profile": {
+    "assessment_mode": "pending",
+    "goals": [],
+    "constraints": [],
+    "competencies": []
+  },
+  "assessment_history": [],
+  "foundation_units": [],
+  "milestones": [],
+  "hint_history": [],
+  "open_improvements": [],
+  "learner_choices": [],
+  "last_review": null,
+  "recommended_next_action": "analyze_repository_then_assess_prerequisites"
+}

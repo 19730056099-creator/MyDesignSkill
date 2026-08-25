@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "repository": {
+    "name": "Pocket Tasks",
+    "source": "evals/fixtures/python-cli",
+    "revision": "fixture-v1"
+  },
+  "course_status": "in_progress",
+  "current_milestone": 2,
+  "milestones": [
+    {"id": "milestone-01", "number": 1, "status": "passed", "acceptance": ["m01-a01"], "risk_notes": []},
+    {"id": "milestone-02", "number": 2, "status": "in_progress", "acceptance": ["m02-a01"], "risk_notes": []},
+    {"id": "milestone-03", "number": 3, "status": "ready", "acceptance": ["m03-a01"], "risk_notes": []},
+    {"id": "milestone-04", "number": 4, "status": "ready", "acceptance": ["m04-a01"], "risk_notes": []},
+    {"id": "milestone-05", "number": 5, "status": "ready", "acceptance": ["m05-a01"], "risk_notes": []}
+  ],
+  "hint_history": [],
+  "open_improvements": [],
+  "learner_choices": [],
+  "last_review": null,
+  "recommended_next_action": "continue_milestone_02"
+}
