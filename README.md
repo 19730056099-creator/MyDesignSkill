@@ -1,6 +1,7 @@
 目前有的skill
-interactive-tutorial-page
- 可视化学习知识
 
-project2learn
+- interactive-tutorial-page
+可视化学习知识
+
+- project2learn
  深度学习一个项目，帮助零基础学生重零到一开发一个想要开发学习的项目，主打一个亲手体会项目的构建，从最开始的小项目逐渐长成boss
