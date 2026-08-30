@@ -38,6 +38,7 @@ Capture these language-neutral fields before writing localized prose:
 - `subsystems`: stable ID, responsibility, inputs, outputs, dependencies, source locations.
 - `flows`: data and control edges between subsystem IDs.
 - `decisions`: design mechanism, pressure it addresses, alternatives visible in evidence.
+- `pressure_candidates`: mature capability or mechanism, the problem it addresses, the simplest inferior design that would expose that problem, and supporting evidence. These are inputs to a teaching reconstruction, not chronology claims.
 - `knowledge`: competency ID, category (`tooling`, `language`, `framework`, `domain`, or `project_concept`), smallest required capability, project need, prerequisite IDs, `required_by` milestone candidates, blocking status, source locations, learning priority, micro-diagnostic, and foundation-unit candidate.
 - `unknowns`: unresolved questions and their impact.
 - `uncovered_scope`: intentionally omitted parts and why.
@@ -89,6 +90,7 @@ Before readiness calibration and reconstruction, confirm that the analysis answe
 - Which subsystems are essential on that path?
 - Where do data and control cross subsystem boundaries?
 - What failures or scale pressures explain the mature mechanisms?
+- What minimum useful V0 could expose the first pressure without prematurely copying the mature architecture?
 - Which concepts are prerequisites, what is their transitive dependency order, and which can be learned just before the milestone that first uses them?
 - Which operational skills are genuinely required by the course workflow rather than merely present in the repository ecosystem?
 - What important area remains uninspected or unverified?

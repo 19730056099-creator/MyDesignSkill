@@ -7,6 +7,7 @@ Project2Learn converts a mature repository into a bilingual journey for reinvent
 - Analyze local or GitHub repositories without modifying the reference
 - Build the project-required competency DAG and calibrate the learner with short questions or micro-tasks
 - Generate only the transitive prerequisite bridges the learner needs, then 5–12 project milestones
+- Use `project-evolution.md` and causal milestone sections to explain previous value → new pressure → design change → new limitation
 - Maintain synchronized `zh-CN` and `en` course trees
 - Separate code evidence, document evidence, and teaching inference
 - Provide five hint levels, stage-aware code review, and persistent progress
@@ -27,7 +28,7 @@ The reference repository remains unchanged. Learning artifacts live separately:
 
 ```text
 project2learn/<repo>/
-├── course/zh-CN/    # readiness, foundations, milestones
+├── course/zh-CN/    # readiness, project-evolution, foundations, milestones
 ├── course/en/
 ├── student/
 ├── reviews/zh-CN/

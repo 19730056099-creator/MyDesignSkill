@@ -31,7 +31,7 @@ Milestones  7–12 project milestone pairs, independent after Render
 Finalize    one strong writer creates GETTING_STARTED, aggregates state, validates
 ```
 
-The planner performs the full repository analysis itself. Before the workflow is launched, normal skill routing should collect `assume_beginner`, a short calibration result, or an explicit waiver. If a direct invocation lacks that input, one bounded readiness scan returns questions and stops before planning. The consolidated render unit keeps project-map, architecture, knowledge-graph, readiness, and roadmap semantically aligned.
+The planner performs the full repository analysis itself. Before the workflow is launched, normal skill routing should collect `assume_beginner`, a short calibration result, or an explicit waiver. If a direct invocation lacks that input, one bounded readiness scan returns questions and stops before planning. The consolidated render unit keeps project-map, architecture, knowledge-graph, readiness, project-evolution, and roadmap semantically aligned.
 
 ## Phase P — analysis and master plan
 
@@ -117,7 +117,7 @@ lose updates. The finalizer is the only post-planning writer of shared state.
 Cold-started agents tend to overproduce. Unless repository complexity clearly
 requires more, use these targets:
 
-- each localized core artifact: roughly 500–900 words;
+- each localized core artifact, including project evolution: roughly 500–900 words;
 - each localized foundation: roughly 400–800 words;
 - each localized milestone: roughly 700–1200 words;
 - handoff note: at most 200 words.
@@ -145,7 +145,7 @@ dependency.
 One finalizer:
 
 1. Reads artifacts, unit-status files, conventions, and failure ledger.
-2. Creates the course-specific bilingual `course/GETTING_STARTED.md`, pointing to readiness and the actual first unit.
+2. Creates the course-specific bilingual `course/GETTING_STARTED.md`, pointing to readiness, project evolution, and the actual first unit.
 3. Aggregates the learner profile, competency states, foundation/milestone statuses, attempts, handoffs, and risks into schema-v2 `progress.json` without deleting history.
 4. Runs the full validator **without** `--partial` and fixes cross-unit errors.
 5. Sets `course_status: ready` only when all required units are done. When milestone 1 has prerequisite work, it sets the first topologically available foundation as `current_unit` and keeps `current_milestone: 0`; otherwise it selects milestone 1. It then runs full validation again.

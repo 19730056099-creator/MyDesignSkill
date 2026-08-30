@@ -12,7 +12,7 @@
       ],
       "expectations": [
         "The reference fixture remains unchanged.",
-        "Both course/zh-CN and course/en contain project-map.md, architecture.md, knowledge-graph.md, readiness.md, roadmap.md, matching foundation files, and matching milestone files.",
+        "Both course/zh-CN and course/en contain project-map.md, architecture.md, knowledge-graph.md, readiness.md, project-evolution.md, roadmap.md, matching foundation files, and matching milestone files.",
         "The two language trees use matching artifact IDs, milestone filenames, source locations, and acceptance IDs.",
         "The Chinese and English acceptance explanations have equivalent technical meaning.",
         "The route contains 5 to 12 milestones driven by observable engineering pressure rather than directory order.",
@@ -34,7 +34,7 @@
         "The reference fixture remains unchanged.",
         "Both localized course trees contain the complete required file set, readiness.md, matching foundation files, and matching stable IDs.",
         "The architecture follows a request from HTTP input through routing, validation, store, response, and failure paths.",
-        "Milestones introduce boundaries only after a prior stage exposes a reason for them.",
+        "Paired project-evolution.md files and milestones agree on the causal chain: previous value, new problem, introduced change, deferred limit, and next pressure.",
         "Every milestone includes executable or observable acceptance criteria and five hint levels.",
         "Code and document evidence are distinguished from teaching inference.",
         "progress.json is shared, language-neutral, schema v2, and does not assign a JavaScript-syntax foundation the learner does not need."

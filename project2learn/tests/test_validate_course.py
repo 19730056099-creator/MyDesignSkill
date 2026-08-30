@@ -8,7 +8,11 @@ from pathlib import Path
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SKILL_ROOT))
 
-from scripts.validate_course import validate_selected_files, validate_workspace
+from scripts.validate_course import (
+    LEGACY_MILESTONE_HEADINGS,
+    validate_selected_files,
+    validate_workspace,
+)
 
 
 CORE_HEADINGS = {
@@ -32,14 +36,19 @@ READINESS_HEADINGS = {
     "en": ["# Learning Readiness", "## Project-Required Competencies", "## Learner Baseline", "## Gaps and Decisions", "## Foundation Route", "## Entry Conditions"],
 }
 
+EVOLUTION_HEADINGS = {
+    "zh-CN": ["# 项目演变", "## 最终问题与成熟能力", "## 最小可用起点", "## 演变总览", "## 阶段因果链", "## 最终架构如何形成", "## 教学路线声明", "## 证据台账"],
+    "en": ["# Project Evolution", "## Final Problem and Mature Capabilities", "## Minimum Viable Starting Point", "## Evolution Overview", "## Stage Causal Chain", "## How the Final Architecture Emerges", "## Teaching-Route Disclaimer", "## Evidence Ledger"],
+}
+
 FOUNDATION_HEADINGS = {
     "zh-CN": ["# 前置补给单元", "## 为什么现在需要", "## 依赖", "## 最小概念", "## 小例子", "## 动手练习", "## 通过标准", "## 项目桥接", "## 暂不学习", "## 完成结论"],
     "en": ["# Foundation Unit", "## Why It Is Needed Now", "## Dependencies", "## Minimal Concepts", "## Small Example", "## Hands-on Exercise", "## Exit Criteria", "## Project Bridge", "## Not Learning Yet", "## Completion Decision"],
 }
 
 MILESTONE_HEADINGS = {
-    "zh-CN": ["# 里程碑", "## 目标", "## 可观察结果", "## 设计压力", "## 范围", "## 约束", "## 前置知识", "## 任务", "## 验收", "## 提示 1", "## 提示 2", "## 提示 3", "## 提示 4", "## 提示 5", "## 下一项压力", "## 源码桥接", "## 证据台账", "## 完成结论"],
-    "en": ["# Milestone", "## Goal", "## Observable Result", "## Design Pressure", "## Scope", "## Constraints", "## Prerequisites", "## Tasks", "## Acceptance", "## Hint 1", "## Hint 2", "## Hint 3", "## Hint 4", "## Hint 5", "## Next Pressure", "## Source Bridge", "## Evidence Ledger", "## Completion Decision"],
+    "zh-CN": ["# 里程碑", "## 当前版本", "## 上一版本解决了什么", "## 用户遇到的新问题", "## 本阶段引入什么", "## 目标", "## 可观察结果", "## 本阶段解决什么", "## 范围", "## 暂时不解决什么", "## 前置知识", "## 任务", "## 验收", "## 提示 1", "## 提示 2", "## 提示 3", "## 提示 4", "## 提示 5", "## 下一阶段为什么会出现", "## 源码桥接", "## 证据台账", "## 完成结论"],
+    "en": ["# Milestone", "## Current Version", "## What the Previous Version Solved", "## New User Problem", "## What This Stage Introduces", "## Goal", "## Observable Result", "## What This Stage Solves", "## Scope", "## Not Solving Yet", "## Prerequisites", "## Tasks", "## Acceptance", "## Hint 1", "## Hint 2", "## Hint 3", "## Hint 4", "## Hint 5", "## Why the Next Stage Appears", "## Source Bridge", "## Evidence Ledger", "## Completion Decision"],
 }
 
 REVIEW_HEADINGS = {
@@ -163,6 +172,10 @@ Open milestone 01.
                 render_artifact("readiness", language, READINESS_HEADINGS[language]),
                 encoding="utf-8",
             )
+            (course / "project-evolution.md").write_text(
+                render_artifact("project-evolution", language, EVOLUTION_HEADINGS[language]),
+                encoding="utf-8",
+            )
         progress_path = self.workspace / "progress.json"
         progress = json.loads(progress_path.read_text(encoding="utf-8"))
         progress.update({
@@ -192,6 +205,20 @@ Open milestone 01.
     def test_valid_bilingual_course_has_no_errors(self) -> None:
         self.assertEqual(validate_workspace(self.workspace), [])
 
+    def test_schema1_accepts_legacy_milestone_headings(self) -> None:
+        for language in ("zh-CN", "en"):
+            for number in range(1, 6):
+                milestone_id = f"milestone-{number:02d}"
+                milestone = self.workspace / "course" / language / "milestones" / f"{number:02d}-stage.md"
+                milestone.write_text(
+                    render_artifact(
+                        milestone_id, language, LEGACY_MILESTONE_HEADINGS[language]
+                    ),
+                    encoding="utf-8",
+                )
+
+        self.assertEqual(validate_workspace(self.workspace), [])
+
     def test_valid_schema2_course_has_no_errors(self) -> None:
         self.upgrade_to_schema2()
 
@@ -213,6 +240,28 @@ Open milestone 01.
         errors = validate_workspace(self.workspace)
 
         self.assertIn("missing course/en/readiness.md", errors)
+
+    def test_schema2_requires_project_evolution_pair(self) -> None:
+        self.upgrade_to_schema2()
+        (self.workspace / "course" / "en" / "project-evolution.md").unlink()
+
+        errors = validate_workspace(self.workspace)
+
+        self.assertIn("missing course/en/project-evolution.md", errors)
+
+    def test_schema2_milestone_requires_causal_evolution_headings(self) -> None:
+        self.upgrade_to_schema2()
+        milestone = self.workspace / "course" / "en" / "milestones" / "01-stage.md"
+        milestone.write_text(
+            milestone.read_text(encoding="utf-8").replace(
+                "## New User Problem", "## Problem"
+            ),
+            encoding="utf-8",
+        )
+
+        errors = validate_workspace(self.workspace)
+
+        self.assertTrue(any("missing heading: ## New User Problem" in error for error in errors))
 
     def test_schema2_blocks_milestone_with_unresolved_competency(self) -> None:
         progress = self.upgrade_to_schema2()

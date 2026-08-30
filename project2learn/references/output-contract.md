@@ -11,6 +11,7 @@
 │   │   ├── architecture.md
 │   │   ├── knowledge-graph.md
 │   │   ├── readiness.md
+│   │   ├── project-evolution.md
 │   │   ├── roadmap.md
 │   │   ├── foundations/FNN-slug.md
 │   │   └── milestones/NN-slug.md
@@ -19,6 +20,7 @@
 │       ├── architecture.md
 │       ├── knowledge-graph.md
 │       ├── readiness.md
+│       ├── project-evolution.md
 │       ├── roadmap.md
 │       ├── foundations/FNN-slug.md
 │       └── milestones/NN-slug.md
@@ -37,8 +39,8 @@
 
 Content requirements:
 
-- an explicit numbered reading order including `readiness.md`, any current foundation, and project milestones;
-- a table mapping every file type to its purpose and when to read it;
+- an explicit numbered reading order including `readiness.md`, any current foundation, `project-evolution.md`, and project milestones;
+- a table mapping every file type to its purpose and when to read it, distinguishing `project-evolution.md` (why stages appear) from `roadmap.md` (what to build and in what order);
 - how to answer readiness questions, choose `assume_beginner`, waive with risk, start a unit, request hints, submit review, and check progress;
 - the learner's concrete first action based on `current_unit`, not an unconditional milestone-01 link;
 - a clear statement that later foundations are introduced just in time rather than front-loaded.
@@ -74,6 +76,7 @@ Foundation completion evidence is stored in schema-v2 learner evidence and found
 | `architecture.md` | 架构；系统上下文；组件；数据流；控制流；关键决策；证据台账 | Architecture; System Context; Components; Data Flow; Control Flow; Key Decisions; Evidence Ledger |
 | `knowledge-graph.md` | 知识图谱；概念依赖；学习优先级；源码位置；最小练习 | Knowledge Graph; Concept Dependencies; Learning Priority; Source Locations; Minimal Exercises |
 | `readiness.md` | 学习准备；项目所需能力；学习者基线；差距与决策；前置补给路线；进入项目的条件 | Learning Readiness; Project-Required Competencies; Learner Baseline; Gaps and Decisions; Foundation Route; Entry Conditions |
+| `project-evolution.md` | 项目演变；最终问题与成熟能力；最小可用起点；演变总览；阶段因果链；最终架构如何形成；教学路线声明；证据台账 | Project Evolution; Final Problem and Mature Capabilities; Minimum Viable Starting Point; Evolution Overview; Stage Causal Chain; How the Final Architecture Emerges; Teaching-Route Disclaimer; Evidence Ledger |
 | `roadmap.md` | 重构路线；路线原则；里程碑总览；覆盖范围；教学性推断 | Reconstruction Roadmap; Roadmap Principles; Milestone Overview; Coverage; Teaching Inferences |
 
 Use one `#` for the first heading and `##` for the remaining headings.
@@ -88,11 +91,17 @@ Use matching IDs such as `foundation-01`, filenames such as `F01-java-minimum.md
 
 Every foundation must explain what the learner does **not** need to study yet. The exit criteria must be observable and normally completable without copying the mature project implementation.
 
+## Project-evolution artifact
+
+Create it from the language-neutral evolution model, not by expanding one localized roadmap. Each stage in `阶段因果链` / `Stage Causal Chain` must state the current version, previous value, new problem, introduced change, resolved pressure, deferred limit, and next pressure. Milestone IDs and source locations must match the roadmap and milestone files. The final section must explicitly say that the route is a teaching reconstruction and is not verified author chronology unless repository history directly supports a narrower claim.
+
 ## Milestone headings
 
-Chinese: `里程碑`, `目标`, `可观察结果`, `设计压力`, `范围`, `约束`, `前置知识`, `任务`, `验收`, `提示 1` through `提示 5`, `下一项压力`, `源码桥接`, `证据台账`, `完成结论`.
+Chinese: `里程碑`, `当前版本`, `上一版本解决了什么`, `用户遇到的新问题`, `本阶段引入什么`, `目标`, `可观察结果`, `本阶段解决什么`, `范围`, `暂时不解决什么`, `前置知识`, `任务`, `验收`, `提示 1` through `提示 5`, `下一阶段为什么会出现`, `源码桥接`, `证据台账`, `完成结论`.
 
-English: `Milestone`, `Goal`, `Observable Result`, `Design Pressure`, `Scope`, `Constraints`, `Prerequisites`, `Tasks`, `Acceptance`, `Hint 1` through `Hint 5`, `Next Pressure`, `Source Bridge`, `Evidence Ledger`, `Completion Decision`.
+English: `Milestone`, `Current Version`, `What the Previous Version Solved`, `New User Problem`, `What This Stage Introduces`, `Goal`, `Observable Result`, `What This Stage Solves`, `Scope`, `Not Solving Yet`, `Prerequisites`, `Tasks`, `Acceptance`, `Hint 1` through `Hint 5`, `Why the Next Stage Appears`, `Source Bridge`, `Evidence Ledger`, `Completion Decision`.
+
+Milestone 1 compares against the minimum viable starting point from `project-evolution.md`; later milestones compare against the preceding milestone's accepted observable result. Keep causal sections concrete and short rather than repeating the task list.
 
 Use matching milestone IDs such as `milestone-01`, filenames such as `01-minimal-value.md`, competency lines such as `competency_id: domain.http.request-response`, optional foundation links such as `foundation_id: foundation-02`, and acceptance IDs such as `m01-a01`.
 
@@ -181,6 +190,6 @@ The validator continues to accept existing schema-v1 workspaces. Do not silently
 
 ## Bilingual parity
 
-Both language trees must contain the same core files, foundation filenames, and milestone filenames. Paired artifacts must share stable IDs, repository source locations, commands, competency IDs, readiness states, `required_by` milestone IDs, acceptance item IDs, verdicts, and stage order. Natural-language explanations should read idiomatically in each language; code identifiers and technical tokens remain unchanged.
+Both language trees must contain the same core files, foundation filenames, and milestone filenames. Paired artifacts must share stable IDs, repository source locations, commands, competency IDs, readiness states, `required_by` milestone IDs, acceptance item IDs, verdicts, stage order, and the causal meaning of each stage's current version, new problem, introduced change, deferred limit, and next pressure. Natural-language explanations should read idiomatically in each language; code identifiers and technical tokens remain unchanged.
 
 Run `scripts/validate_course.py` before setting a course to `ready` or `complete`.

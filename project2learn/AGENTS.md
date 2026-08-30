@@ -24,8 +24,8 @@ project2learn/
 ├── references/
 │   ├── repository-analysis.md  # 仓库分析 + 项目所需能力 DAG
 │   ├── learner-readiness.md    # 学习者校准、传递依赖、前置补给、及时门控
-│   ├── reconstruction-method.md# 重建方法论（补给与里程碑分离 + 倒推正排）
-│   ├── output-contract.md      # 输出契约（目录树、双语同步、GETTING_STARTED 必备）
+│   ├── reconstruction-method.md# 重建方法论（补给分离 + 倒推正排 + 因果演变链）
+│   ├── output-contract.md      # 输出契约（含双语 project-evolution 与 GETTING_STARTED）
 │   ├── tutor-and-review.md     # 辅导循环、5 级提示阶梯、阶段感知评审、状态机
 │   └── fanout-generation.md    # 大仓库 fan-out v3（硬门控/浅依赖/单写者收尾）
 ├── scripts/
@@ -35,6 +35,7 @@ project2learn/
 ├── assets/templates/           # zh-CN 与 en 成对模板（roadmap/milestone/review 等）
 │   └─ progress.json            # 语言中立的状态模板
 ├── evals/                      # 评测用例 + fixture 小仓库（python-cli/web-api/infra-loop/session）
+├── version/                    # complain-v1/v2：设计目标、旧版痛点与版本改进说明
 └── tests/                      # init/templates/validate/fan-out 契约测试
 ```
 
@@ -80,8 +81,8 @@ project2learn/
 5. 形成语言中立仓库模型与项目所需能力 DAG：稳定 competency ID、类别、传递依赖、阻塞性、required_by、微诊断和证据。
 6. 复用用户已说明的水平，让用户选择 `assume_beginner`、3–7 个项目相关的短校准，或显式豁免并记录风险；等待必要答案时保持 analyzing、current_milestone 0。
 7. 计算个人缺口，按拓扑生成 0–8 个短前置补给；只前置里程碑 1 所需内容，后续依赖及时补。
-8. 按 output-contract.md 渲染双语 project-map / architecture / knowledge-graph / readiness / roadmap、foundation 与 milestone，以及 `GETTING_STARTED.md`。
-9. 按 reconstruction-method.md 重建 5–12 个项目里程碑；补给单元不占里程碑数量。
+8. 按 reconstruction-method.md 建立语言中立的演变模型，重建 5–12 个因果相连的项目里程碑；补给单元不占里程碑数量。
+9. 按 output-contract.md 渲染双语 project-map / architecture / knowledge-graph / readiness / project-evolution / roadmap、foundation 与 milestone，以及 `GETTING_STARTED.md`。
 10. 填充 schema-v2 learner_profile、foundation、milestone 与 current_unit，保持 analyzing。
 11. 运行 `validate_course.py`，修复错误直至通过。
 12. 通过后置 ready：若里程碑 1 有缺口，current_unit 指向第一个 foundation 且 current_milestone 0；否则指向 milestone-01 且 current_milestone 1。再跑完整校验。
@@ -98,7 +99,7 @@ project2learn/
 
 1. Gate：规模判断 + 学习者准备度门控；缺 learnerProfile 时返回 `assessment_required`，不生成固定路线。
 2. Plan：一个强 planner 一次完成仓库分析、能力 DAG、个人缺口、语言中立模型与 plan；**禁止再派一个 analysis agent 重复读仓库**。
-3. Render：把 project-map / architecture / knowledge-graph / readiness / roadmap 及所有 unit-def 合并给一个双语 writer。
+3. Render：把 project-map / architecture / knowledge-graph / readiness / project-evolution / roadmap 及所有 unit-def 合并给一个双语 writer；演变文档与 milestone-def 共用同一因果链。
 4. Foundations：0–6 个补给只依赖 Render 和自己的 foundation-def；文件可并行生成，学习顺序由 DAG 和 progress 控制。
 5. Milestones：7–12 个项目里程碑只依赖 Render 和自己的 milestone-def，不得彼此串联，必须一波并行。
 6. Finalize：唯一共享状态写者；生成 `GETTING_STARTED.md`、聚合 schema-v2 状态、选择第一个 foundation 或 milestone 并完整校验。
@@ -136,7 +137,7 @@ plan/finalize；未提供时会退回运行时默认模型，速度不作保证�
 
 ## 7. 完成门槛
 
-- 课程 `ready` = 双语树通过校验 + readiness 决策 + 0–8 对补给 + 5–12 对项目里程碑；不代表未来所有前置能力已掌握。
+- 课程 `ready` = 双语树通过校验 + readiness 决策 + project-evolution 成对且与里程碑因果一致 + 0–8 对补给 + 5–12 对项目里程碑；不代表未来所有前置能力已掌握。
 - Foundation `passed` = 退出能力有可观察证据，并把相关 competency 置为 ready/demonstrated。
 - 里程碑开始 = 其 blocking competency 已 ready 或显式 waived 并记录风险。
 - 里程碑 `passed` = 有具体验收证据。

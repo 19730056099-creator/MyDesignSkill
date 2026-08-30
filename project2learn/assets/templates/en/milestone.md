@@ -5,6 +5,22 @@ language: en
 
 # Milestone
 
+## Current Version
+
+{{current_version}}
+
+## What the Previous Version Solved
+
+{{previous_value}}
+
+## New User Problem
+
+{{new_problem}}
+
+## What This Stage Introduces
+
+{{introduced_change}}
+
 ## Goal
 
 {{goal}}
@@ -13,17 +29,17 @@ language: en
 
 {{observable_result}}
 
-## Design Pressure
+## What This Stage Solves
 
-{{design_pressure}}
+{{resolved_pressure}}
 
 ## Scope
 
 {{scope}}
 
-## Constraints
+## Not Solving Yet
 
-{{constraints}}
+{{deferred_limit}}
 
 ## Prerequisites
 
@@ -57,7 +73,7 @@ language: en
 
 {{hint_5}}
 
-## Next Pressure
+## Why the Next Stage Appears
 
 {{next_pressure}}
 

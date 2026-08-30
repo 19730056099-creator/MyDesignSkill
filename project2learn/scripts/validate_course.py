@@ -38,6 +38,7 @@ CORE_HEADINGS = {
         "architecture.md": ["# 架构", "## 系统上下文", "## 组件", "## 数据流", "## 控制流", "## 关键决策", "## 证据台账"],
         "knowledge-graph.md": ["# 知识图谱", "## 概念依赖", "## 学习优先级", "## 源码位置", "## 最小练习"],
         "readiness.md": ["# 学习准备", "## 项目所需能力", "## 学习者基线", "## 差距与决策", "## 前置补给路线", "## 进入项目的条件"],
+        "project-evolution.md": ["# 项目演变", "## 最终问题与成熟能力", "## 最小可用起点", "## 演变总览", "## 阶段因果链", "## 最终架构如何形成", "## 教学路线声明", "## 证据台账"],
         "roadmap.md": ["# 重构路线", "## 路线原则", "## 里程碑总览", "## 覆盖范围", "## 教学性推断"],
     },
     "en": {
@@ -45,6 +46,7 @@ CORE_HEADINGS = {
         "architecture.md": ["# Architecture", "## System Context", "## Components", "## Data Flow", "## Control Flow", "## Key Decisions", "## Evidence Ledger"],
         "knowledge-graph.md": ["# Knowledge Graph", "## Concept Dependencies", "## Learning Priority", "## Source Locations", "## Minimal Exercises"],
         "readiness.md": ["# Learning Readiness", "## Project-Required Competencies", "## Learner Baseline", "## Gaps and Decisions", "## Foundation Route", "## Entry Conditions"],
+        "project-evolution.md": ["# Project Evolution", "## Final Problem and Mature Capabilities", "## Minimum Viable Starting Point", "## Evolution Overview", "## Stage Causal Chain", "## How the Final Architecture Emerges", "## Teaching-Route Disclaimer", "## Evidence Ledger"],
         "roadmap.md": ["# Reconstruction Roadmap", "## Roadmap Principles", "## Milestone Overview", "## Coverage", "## Teaching Inferences"],
     },
 }
@@ -54,9 +56,14 @@ FOUNDATION_HEADINGS = {
     "en": ["# Foundation Unit", "## Why It Is Needed Now", "## Dependencies", "## Minimal Concepts", "## Small Example", "## Hands-on Exercise", "## Exit Criteria", "## Project Bridge", "## Not Learning Yet", "## Completion Decision"],
 }
 
-MILESTONE_HEADINGS = {
+LEGACY_MILESTONE_HEADINGS = {
     "zh-CN": ["# 里程碑", "## 目标", "## 可观察结果", "## 设计压力", "## 范围", "## 约束", "## 前置知识", "## 任务", "## 验收", "## 提示 1", "## 提示 2", "## 提示 3", "## 提示 4", "## 提示 5", "## 下一项压力", "## 源码桥接", "## 证据台账", "## 完成结论"],
     "en": ["# Milestone", "## Goal", "## Observable Result", "## Design Pressure", "## Scope", "## Constraints", "## Prerequisites", "## Tasks", "## Acceptance", "## Hint 1", "## Hint 2", "## Hint 3", "## Hint 4", "## Hint 5", "## Next Pressure", "## Source Bridge", "## Evidence Ledger", "## Completion Decision"],
+}
+
+MILESTONE_HEADINGS = {
+    "zh-CN": ["# 里程碑", "## 当前版本", "## 上一版本解决了什么", "## 用户遇到的新问题", "## 本阶段引入什么", "## 目标", "## 可观察结果", "## 本阶段解决什么", "## 范围", "## 暂时不解决什么", "## 前置知识", "## 任务", "## 验收", "## 提示 1", "## 提示 2", "## 提示 3", "## 提示 4", "## 提示 5", "## 下一阶段为什么会出现", "## 源码桥接", "## 证据台账", "## 完成结论"],
+    "en": ["# Milestone", "## Current Version", "## What the Previous Version Solved", "## New User Problem", "## What This Stage Introduces", "## Goal", "## Observable Result", "## What This Stage Solves", "## Scope", "## Not Solving Yet", "## Prerequisites", "## Tasks", "## Acceptance", "## Hint 1", "## Hint 2", "## Hint 3", "## Hint 4", "## Hint 5", "## Why the Next Stage Appears", "## Source Bridge", "## Evidence Ledger", "## Completion Decision"],
 }
 
 REVIEW_HEADINGS = {
@@ -98,6 +105,18 @@ def _check_headings(path: Path, headings: list[str], errors: list[str]) -> str:
         if heading not in lines:
             errors.append(f"{relative} missing heading: {heading}")
     return text
+
+
+def _check_milestone_headings(
+    path: Path, language: str, schema_version: int | None, errors: list[str]
+) -> str:
+    if schema_version == 1:
+        text = path.read_text(encoding="utf-8")
+        lines = {line.strip() for line in text.splitlines()}
+        if all(heading in lines for heading in MILESTONE_HEADINGS[language]):
+            return text
+        return _check_headings(path, LEGACY_MILESTONE_HEADINGS[language], errors)
+    return _check_headings(path, MILESTONE_HEADINGS[language], errors)
 
 
 def _check_evidence(path: Path, text: str, errors: list[str]) -> int:
@@ -549,7 +568,7 @@ def validate_selected_files(workspace: Path, selected: list[str]) -> list[str]:
                 if _metadata(text, "language") != language:
                     errors.append(f"{relative.as_posix()} has incorrect language metadata")
                 evidence_count = _check_evidence(relative, text, errors)
-                if filename in {"project-map.md", "architecture.md", "roadmap.md"} and evidence_count == 0:
+                if filename in {"project-map.md", "architecture.md", "project-evolution.md", "roadmap.md"} and evidence_count == 0:
                     errors.append(f"{relative.as_posix()} requires at least one evidence entry")
                 core[(language, filename)] = text
             continue
@@ -705,7 +724,7 @@ def validate_workspace(workspace: Path, *, partial: bool = False) -> list[str]:
     for language in LANGUAGES:
         course_root = workspace / "course" / language
         for filename, headings in CORE_HEADINGS[language].items():
-            if filename == "readiness.md" and schema_version == 1:
+            if filename in {"readiness.md", "project-evolution.md"} and schema_version == 1:
                 continue
             path = course_root / filename
             relative = path.relative_to(workspace).as_posix()
@@ -722,7 +741,7 @@ def validate_workspace(workspace: Path, *, partial: bool = False) -> list[str]:
             if _metadata(text, "language") != language:
                 errors.append(f"{relative} has incorrect language metadata")
             evidence_count = _check_evidence(path.relative_to(workspace), text, errors)
-            if filename in {"project-map.md", "architecture.md", "roadmap.md"} and evidence_count == 0:
+            if filename in {"project-map.md", "architecture.md", "project-evolution.md", "roadmap.md"} and evidence_count == 0:
                 errors.append(f"{relative} requires at least one evidence entry")
 
     for filename in CORE_HEADINGS["en"]:
@@ -833,7 +852,7 @@ def validate_workspace(workspace: Path, *, partial: bool = False) -> list[str]:
         for language in LANGUAGES:
             path = workspace / "course" / language / "milestones" / filename
             relative = path.relative_to(workspace)
-            text = _check_headings(path, MILESTONE_HEADINGS[language], errors)
+            text = _check_milestone_headings(path, language, schema_version, errors)
             texts[language] = text
             if _frontmatter(text) is None:
                 errors.append(f"{relative.as_posix()} missing opening frontmatter")

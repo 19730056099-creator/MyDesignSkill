@@ -23,13 +23,14 @@ contract in references/output-contract.md (artifact_id: getting-started).
 ## Suggested reading order / 建议阅读顺序
 
 1. `course/<lang>/project-map.md` — purpose, user journey, subsystems
-2. `course/<lang>/architecture.md` — how components cooperate (revisit after milestones)
-3. `course/<lang>/knowledge-graph.md` — project-required competency dependencies
-4. `course/<lang>/readiness.md` — your baseline, gaps, and personalized entry conditions
-5. `course/<lang>/foundations/FNN-*.md` — only the prerequisite bridges you need
-6. `course/<lang>/roadmap.md` — where you are and what comes next
-7. `course/<lang>/milestones/NN-*.md` — project reconstruction, one milestone at a time
-8. Write exercises and project code under `student/`; submit evidence to the tutor.
+2. `course/<lang>/knowledge-graph.md` — project-required competency dependencies
+3. `course/<lang>/readiness.md` — your baseline, gaps, and personalized entry conditions
+4. `course/<lang>/foundations/FNN-*.md` — only the prerequisite bridges you need
+5. `course/<lang>/project-evolution.md` — why each project stage appears
+6. `course/<lang>/roadmap.md` — what to build and in what order
+7. `course/<lang>/milestones/NN-*.md` — project reconstruction, one causal stage at a time
+8. `course/<lang>/architecture.md` — how mature components cooperate (revisit after milestones)
+9. Write exercises and project code under `student/`; submit evidence to the tutor.
 
 Repository: {repository}
 """

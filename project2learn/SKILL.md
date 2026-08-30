@@ -18,6 +18,7 @@ Reconstruct the learning journey behind a mature repository and personalize the 
 - Teach only the transitive prerequisite subset needed by the selected project path. Use short foundation units rather than redirecting the learner to generic full courses.
 - Reveal answers gradually. Start with the lowest useful hint, but honor an explicit request for a deeper hint or reference implementation.
 - Review the learner against the current foundation or milestone. A simple early design may pass even when the mature project later replaces it.
+- Explain every milestone as a causal evolution: previous value → new problem → introduced change → resolved pressure → deferred limit → next pressure. Keep this teaching reconstruction distinct from verified project history.
 
 ## Route the request
 
@@ -58,8 +59,8 @@ Ordinary code explanation, bug fixing, feature implementation, generic code revi
    - Ask only project-relevant, capability-based questions. Do not issue a generic technology survey.
    - Keep `course_status: analyzing`, `learning_phase: assessing`, and `current_milestone: 0` while awaiting required answers.
 7. Compute the learner-specific prerequisite gap and topological foundation route. Create only units that close required gaps; front-load only those needed for milestone 1 and attach later units just in time.
-8. Read `references/output-contract.md`. Render matching `project-map.md`, `architecture.md`, `knowledge-graph.md`, `readiness.md`, and `roadmap.md` files, plus paired foundation and milestone files and the mandatory `course/GETTING_STARTED.md`.
-9. Read `references/reconstruction-method.md`. Reconstruct 5–12 project milestones driven by prerequisites and engineering pressure, not directory order or commit chronology. Foundation units do not count toward the 5–12 milestone range.
+8. Read `references/reconstruction-method.md`. Build a language-neutral evolution model and reconstruct 5–12 causally connected project milestones driven by prerequisites and engineering pressure, not directory order or commit chronology. Foundation units do not count toward the 5–12 milestone range.
+9. Read `references/output-contract.md`. Render matching `project-map.md`, `architecture.md`, `knowledge-graph.md`, `readiness.md`, `project-evolution.md`, and `roadmap.md` files, plus paired foundation and milestone files and the mandatory `course/GETTING_STARTED.md`.
 10. Populate schema-v2 language-neutral competency, foundation, milestone, and current-unit records while keeping `course_status: analyzing`.
 11. Validate the staged course:
 
@@ -76,7 +77,7 @@ Ordinary code explanation, bug fixing, feature implementation, generic code revi
 
 ## Fan-out generation (large repositories)
 
-Use fan-out only when the repository has at least about 20 relevant files **and** the justified route has 7–12 milestones, unless the user explicitly requests a diagnostic override. Collect or explicitly waive a learner profile before full generation. A direct workflow invocation without one returns `assessment_required` instead of manufacturing a fixed route. The v3 workflow uses one planner for the repository and competency models, consolidates paired core rendering, and runs bounded foundation and milestone units in a shallow parallel wave. Executors use isolated validation, write unique unit-status files, and never edit shared `progress.json`; one finalizer selects the first foundation or milestone and runs full validation. Full contract: `references/fanout-generation.md`. Script: `scripts/fanout_course.workflow.js`.
+Use fan-out only when the repository has at least about 20 relevant files **and** the justified route has 7–12 milestones, unless the user explicitly requests a diagnostic override. Collect or explicitly waive a learner profile before full generation. A direct workflow invocation without one returns `assessment_required` instead of manufacturing a fixed route. The v3 workflow uses one planner for the repository, competency, and evolution models, consolidates paired core rendering (including `project-evolution.md`), and runs bounded foundation and milestone units in a shallow parallel wave. Executors use isolated validation, write unique unit-status files, and never edit shared `progress.json`; one finalizer selects the first foundation or milestone and runs full validation. Full contract: `references/fanout-generation.md`. Script: `scripts/fanout_course.workflow.js`.
 
 ## Interactive workflow
 
@@ -103,4 +104,4 @@ Use fan-out only when the repository has at least about 20 relevant files **and*
 
 ## Completion gates
 
-A course is `ready` only when both language trees validate, contain 5–12 paired milestones, and have a readiness decision. “Ready” means the personalized learning path is ready; it does not imply every future prerequisite is already mastered. A foundation unit passes only with exit evidence. A project milestone may start only when its blocking competencies are ready or explicitly waived with risk. A milestone passes only with acceptance evidence. The course is `complete` only when all milestones are passed or explicitly skipped with risk, both language trees remain aligned, and the final review connects the learner's journey back to the mature repository.
+A course is `ready` only when both language trees validate, include the paired project-evolution artifact, contain 5–12 paired milestones, and have a readiness decision. “Ready” means the personalized learning path is ready; it does not imply every future prerequisite is already mastered. A foundation unit passes only with exit evidence. A project milestone may start only when its blocking competencies are ready or explicitly waived with risk. A milestone passes only with acceptance evidence. The course is `complete` only when all milestones are passed or explicitly skipped with risk, both language trees remain aligned, and the final review connects the learner's journey back to the mature repository.

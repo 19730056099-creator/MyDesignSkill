@@ -13,6 +13,16 @@ Use this protocol after the repository model and project-required competency DAG
 
 The result is a teaching reconstruction. It is not a claim about the author's actual chronology.
 
+Before localized rendering, create one language-neutral evolution model with:
+
+- `mature_problem` and `mature_capabilities`;
+- `minimum_viable_start`: the smallest runnable V0 that provides observable value without the final architecture;
+- `stages`: ordered records containing `id`, `current_version`, `previous_value`, `new_problem`, `introduced_change`, `resolved_pressure`, `deferred_limit`, `next_pressure`, `source_bridge`, and typed evidence;
+- `architecture_growth`: which responsibilities or boundaries appear only after their pressure becomes visible;
+- `route_disclaimer`: the evidence-backed statement that this is a teaching route rather than verified commit history.
+
+Maintain causal continuity: a stage's `current_version` must describe the system produced by the prior stage (or V0 for milestone 1), and its `next_pressure` must motivate the next stage's `new_problem`. If those links cannot be stated concretely, merge, reorder, or remove the disconnected stage.
+
 ## 2. Keep foundations separate from milestones
 
 A foundation unit closes a learner-specific prerequisite gap. A milestone reconstructs observable project value under engineering pressure. Do not inflate the 5–12 milestone route with generic language, framework, terminal, or Git lessons.
@@ -25,13 +35,15 @@ Every milestone needs:
 
 - one stable ID shared across languages;
 - a runnable, observable, or statically testable outcome;
-- the problem and design pressure visible at this point;
-- explicit scope and temporary constraints;
+- the current version and the value delivered by the previous version;
+- the concrete new user or engineering problem visible at this point;
+- the mechanism introduced now, what it solves, and why it is no earlier than necessary;
+- explicit scope and what remains deliberately unsolved;
 - stable competency IDs for prerequisites introduced just in time, with blocking status and any foundation-unit bridge;
 - implementation tasks that leave design choices to the learner;
 - concrete acceptance evidence;
 - five progressively revealing hint levels;
-- the next pressure that motivates the following stage;
+- the next pressure that motivates the following stage, using the same causal meaning as that following stage's new problem;
 - a source bridge to relevant mature-project files or symbols;
 - an evidence ledger and completion decision.
 
@@ -54,6 +66,7 @@ Choose patterns based on repository evidence, not project category labels:
 Revise the route when it:
 
 - mirrors folders, classes, or commit order without problem pressure;
+- presents isolated tasks whose previous value, new problem, introduced change, and next pressure do not form a causal chain;
 - uses stages such as “add the service layer” without an observable reason;
 - introduces several major concepts in one stage;
 - cannot be accepted with evidence;
@@ -67,4 +80,6 @@ Revise the route when it:
 
 Create a neutral stage record first. Render Chinese and English from that record. Pair files by identical filename and `artifact_id`. Keep code identifiers, repository paths, commands, configuration keys, API names, and protocol tokens unchanged. Translate explanation, pedagogy, constraints, and review language while preserving technical meaning.
 
-Before marking the route ready, compare every pair for readiness decisions, competency IDs/states, foundation count/order, stage count/order, acceptance meaning, evidence sources, hint escalation, next pressure, and completion decision.
+Render the neutral evolution model as paired `project-evolution.md` artifacts before rendering milestone prose. The artifact must show the mature problem, V0, stage overview, stage-by-stage causal chain, architecture growth, and the teaching-route disclaimer. It complements `roadmap.md`: the roadmap says what to build and in what order; project evolution explains why each stage exists.
+
+Before marking the route ready, compare every pair for readiness decisions, competency IDs/states, foundation count/order, stage count/order, current/previous version meaning, new problems, introduced changes, deferred limits, acceptance meaning, evidence sources, hint escalation, next pressure, and completion decision.

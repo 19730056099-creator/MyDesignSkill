@@ -22,7 +22,8 @@ class FanoutWorkflowContractTests(unittest.TestCase):
         self.assertIn("mode: 'single_required'", self.script)
 
     def test_planner_analyzes_once_and_milestones_are_one_parallel_wave(self) -> None:
-        self.assertIn("language-neutral repository and competency models", self.script)
+        self.assertIn("language-neutral repository, competency, and project-evolution models", self.script)
+        self.assertIn("paired course/<lang>/project-evolution.md", self.script)
         self.assertIn("Do not create a separate analysis execution unit", self.script)
         self.assertIn("depends_on: [render.id]", self.script)
         self.assertIn("await parallel(ready.map", self.script)

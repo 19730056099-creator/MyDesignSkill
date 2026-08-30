@@ -5,6 +5,22 @@ language: zh-CN
 
 # 里程碑
 
+## 当前版本
+
+{{current_version}}
+
+## 上一版本解决了什么
+
+{{previous_value}}
+
+## 用户遇到的新问题
+
+{{new_problem}}
+
+## 本阶段引入什么
+
+{{introduced_change}}
+
 ## 目标
 
 {{goal}}
@@ -13,17 +29,17 @@ language: zh-CN
 
 {{observable_result}}
 
-## 设计压力
+## 本阶段解决什么
 
-{{design_pressure}}
+{{resolved_pressure}}
 
 ## 范围
 
 {{scope}}
 
-## 约束
+## 暂时不解决什么
 
-{{constraints}}
+{{deferred_limit}}
 
 ## 前置知识
 
@@ -57,7 +73,7 @@ language: zh-CN
 
 {{hint_5}}
 
-## 下一项压力
+## 下一阶段为什么会出现
 
 {{next_pressure}}
 
