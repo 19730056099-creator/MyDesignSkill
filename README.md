@@ -7,7 +7,7 @@
 | Skill | 用途 | 入口 |
 |---|---|---|
 | [`interactive-tutorial-page`](interactive-tutorial-page/) | 用交互式动画和自主操作，为零基础用户讲解数学、物理、编程、算法、语言、经济等知识 | [`SKILL.md`](interactive-tutorial-page/SKILL.md) |
-| [`project2learn`](project2learn/) | 将成熟代码仓库转换成中英双语的“从零重建”学习课程，支持能力诊断、里程碑和代码评审 | [`SKILL.md`](project2learn/SKILL.md) · [中文说明](project2learn/README.zh-CN.md) |
+| [`project2learn`](project2learn/) | 将成熟代码仓库转换成中英双语的“从零重建”学习课程，支持准备度与学习模式诊断、技术层级/故障定位地图、Touch → Understand → Own 实践、里程碑和阶段评审 | [`SKILL.md`](project2learn/SKILL.md) · [中文说明](project2learn/README.zh-CN.md) · [完整用法](project2learn/USAGE.zh-CN.md) |
 | [`college-final-exam-ai-skill`](college-final-exam-ai-skill/) | 根据课程 PPT、考试重点和往年题，建立面向得分的大学期末考试知识系统 | [`SKILL.md`](college-final-exam-ai-skill/SKILL.md) · [项目说明](college-final-exam-ai-skill/README.md) |
 | [`docx`](docx/) | 创建、读取、编辑和分析 Word 文档（`.docx`） | [`SKILL.md`](docx/SKILL.md) |
 | [`pdf`](pdf/) | 读取、提取、合并、拆分、填写和生成 PDF 文件 | [`SKILL.md`](pdf/SKILL.md) |
@@ -37,7 +37,11 @@
 使用 skill-creator，创建一个处理某类任务的新 Skill，并设计验证方法。
 ```
 
-Skill 被触发后，助手会按对应 `SKILL.md` 的规则工作。文档类 Skill 只在请求涉及相应文件类型时使用；学习类 Skill 会根据任务选择合适的教学或复习流程。
+Skill 被触发后，助手会按对应 `SKILL.md` 的规则工作。文档类 Skill 只在请求涉及相应文件类型时使用；学习类 Skill 会根据目标和基础选择合适的教学或复习流程。Project2Learn 会先进行项目相关准备度校准（或按零基础/显式豁免处理），并记录 AI 使用与学习者的亲手实践证据。
+
+## Project2Learn v3
+
+Project2Learn 当前使用 schema v3：每个 foundation 和 milestone 都声明首次触摸、AI 使用边界、关键亲手实践以及理解/迁移检查；通过单元还需要匹配的实践证据。旧 schema v1/v2 工作区可以渐进迁移，不会重置历史进度。
 
 ## 项目结构
 
