@@ -37,9 +37,11 @@ Capture these language-neutral fields before writing localized prose:
 - `journey`: ordered steps for the main user action.
 - `subsystems`: stable ID, responsibility, inputs, outputs, dependencies, source locations.
 - `flows`: data and control edges between subsystem IDs.
+- `technology_map`: the minimum learner-facing layers from user action through runtime, network/process boundaries, application components, and storage; include only layers present in the selected path.
+- `troubleshooting_map`: observable failure, likely layer, first inspection action, and the next boundary to check. This is an orientation map, not a generic operations syllabus.
 - `decisions`: design mechanism, pressure it addresses, alternatives visible in evidence.
 - `pressure_candidates`: mature capability or mechanism, the problem it addresses, the simplest inferior design that would expose that problem, and supporting evidence. These are inputs to a teaching reconstruction, not chronology claims.
-- `knowledge`: competency ID, category (`tooling`, `language`, `framework`, `domain`, or `project_concept`), smallest required capability, project need, prerequisite IDs, `required_by` milestone candidates, blocking status, source locations, learning priority, micro-diagnostic, and foundation-unit candidate.
+- `knowledge`: competency ID, category (`tooling`, `language`, `framework`, `domain`, or `project_concept`), smallest required capability, project need, prerequisite IDs, `required_by` milestone candidates, blocking status, source locations, learning priority, micro-diagnostic, foundation-unit candidate, and later units where the capability can recur at `touched`, `explained`, `debugged`, or `transferred` depth.
 - `unknowns`: unresolved questions and their impact.
 - `uncovered_scope`: intentionally omitted parts and why.
 - `evidence`: typed entries supporting the fields above.
@@ -89,6 +91,8 @@ Before readiness calibration and reconstruction, confirm that the analysis answe
 - What is the smallest end-to-end path that demonstrates that value?
 - Which subsystems are essential on that path?
 - Where do data and control cross subsystem boundaries?
+- Can a beginner place each command, generated file, runtime process, and common failure on a minimal technology-layer map?
+- Does every high-frequency failure have a smallest first inspection step rather than an open-ended “debug it” instruction?
 - What failures or scale pressures explain the mature mechanisms?
 - What minimum useful V0 could expose the first pressure without prematurely copying the mature architecture?
 - Which concepts are prerequisites, what is their transitive dependency order, and which can be learned just before the milestone that first uses them?

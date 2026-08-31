@@ -10,6 +10,8 @@ sys.path.insert(0, str(SKILL_ROOT))
 
 from scripts.validate_course import (
     LEGACY_MILESTONE_HEADINGS,
+    V3_CORE_HEADINGS,
+    V3_MILESTONE_HEADINGS,
     validate_selected_files,
     validate_workspace,
 )
@@ -199,6 +201,49 @@ Open milestone 01.
         progress_path.write_text(json.dumps(progress, ensure_ascii=False, indent=2), encoding="utf-8")
         return progress
 
+    def upgrade_to_schema3(self) -> dict:
+        progress = self.upgrade_to_schema2()
+        progress["schema_version"] = 3
+        progress["learner_profile"]["learning_mode"] = "balanced"
+        progress["practice_evidence"] = []
+        for language in ("zh-CN", "en"):
+            course = self.workspace / "course" / language
+            for filename in ("project-map.md", "knowledge-graph.md", "readiness.md"):
+                artifact_id = filename.removesuffix(".md")
+                text = render_artifact(artifact_id, language, V3_CORE_HEADINGS[language][filename])
+                if filename == "readiness.md":
+                    text += "learning_mode: balanced\n"
+                (course / filename).write_text(text, encoding="utf-8")
+            for number in range(1, 6):
+                milestone_id = f"milestone-{number:02d}"
+                (course / "milestones" / f"{number:02d}-stage.md").write_text(
+                    render_artifact(milestone_id, language, V3_MILESTONE_HEADINGS[language]),
+                    encoding="utf-8",
+                )
+        (self.workspace / "course" / "GETTING_STARTED.md").write_text(
+            """---
+artifact_id: getting-started
+language: bilingual
+---
+# 学习指南 / Learning Guide
+## 课程是什么 / What This Course Is
+Test course.
+## 文件总览与阅读顺序 / File Overview and Reading Order
+1. Read readiness, project evolution, and the current unit.
+## 各文件的用途速查 / Quick File Reference
+Use each file for its stated purpose.
+## 使用规则 / Usage Rules
+Record manual practice and AI usage.
+## 现在就开始 / Start Now
+Open the current unit.
+""",
+            encoding="utf-8",
+        )
+        (self.workspace / "progress.json").write_text(
+            json.dumps(progress, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        return progress
+
     def tearDown(self) -> None:
         self.temporary.cleanup()
 
@@ -224,14 +269,81 @@ Open milestone 01.
 
         self.assertEqual(validate_workspace(self.workspace), [])
 
+    def test_valid_schema3_course_has_no_errors(self) -> None:
+        self.upgrade_to_schema3()
+
+        self.assertEqual(validate_workspace(self.workspace), [])
+
+    def test_schema3_requires_learning_mode_decision(self) -> None:
+        progress = self.upgrade_to_schema3()
+        progress["learner_profile"]["learning_mode"] = "pending"
+        (self.workspace / "progress.json").write_text(json.dumps(progress), encoding="utf-8")
+
+        errors = validate_workspace(self.workspace)
+
+        self.assertIn("active schema-v3 course requires a learning_mode decision", errors)
+
+    def test_schema3_requires_touch_ai_and_transfer_sections(self) -> None:
+        self.upgrade_to_schema3()
+        milestone = self.workspace / "course" / "en" / "milestones" / "01-stage.md"
+        milestone.write_text(
+            milestone.read_text(encoding="utf-8").replace("## First Touch", "## Try It"),
+            encoding="utf-8",
+        )
+
+        errors = validate_workspace(self.workspace)
+
+        self.assertTrue(any("missing heading: ## First Touch" in error for error in errors))
+
+    def test_schema3_requires_complete_bilingual_getting_started(self) -> None:
+        self.upgrade_to_schema3()
+        guide = self.workspace / "course" / "GETTING_STARTED.md"
+        guide.write_text(
+            guide.read_text(encoding="utf-8").replace(
+                "## 使用规则 / Usage Rules", "## Usage"
+            ),
+            encoding="utf-8",
+        )
+
+        errors = validate_workspace(self.workspace)
+
+        self.assertIn(
+            "course/GETTING_STARTED.md missing heading: ## 使用规则 / Usage Rules", errors
+        )
+
+    def test_schema3_passed_unit_requires_practice_evidence(self) -> None:
+        progress = self.upgrade_to_schema3()
+        progress["milestones"][0]["status"] = "passed"
+        (self.workspace / "progress.json").write_text(json.dumps(progress), encoding="utf-8")
+
+        errors = validate_workspace(self.workspace)
+
+        self.assertIn("passed milestone requires practice evidence: milestone-01", errors)
+
+    def test_schema3_accepts_passed_unit_with_practice_evidence(self) -> None:
+        progress = self.upgrade_to_schema3()
+        progress["milestones"][0]["status"] = "passed"
+        progress["practice_evidence"] = [{
+            "unit_id": "milestone-01",
+            "depth": "explained",
+            "manual_action": "Ran the command and changed the critical branch.",
+            "observable_result": "The acceptance command passed.",
+            "explanation": "Explained the input-to-output control flow.",
+            "ai_usage": "AI generated scaffolding; learner authored the branch.",
+            "timestamp": "2025-01-02T00:00:00Z",
+        }]
+        (self.workspace / "progress.json").write_text(json.dumps(progress), encoding="utf-8")
+
+        self.assertEqual(validate_workspace(self.workspace), [])
+
     def test_schema2_active_course_requires_readiness_decision(self) -> None:
         progress = self.upgrade_to_schema2()
         progress["learner_profile"]["assessment_mode"] = "pending"
         progress["assessment_history"] = []
         (self.workspace / "progress.json").write_text(json.dumps(progress), encoding="utf-8")
         errors = validate_workspace(self.workspace)
-        self.assertIn("active schema-v2 course requires a readiness decision", errors)
-        self.assertIn("active schema-v2 course requires assessment_history", errors)
+        self.assertIn("active schema-v2+ course requires a readiness decision", errors)
+        self.assertIn("active schema-v2+ course requires assessment_history", errors)
 
     def test_schema2_requires_readiness_pair(self) -> None:
         self.upgrade_to_schema2()
@@ -383,6 +495,12 @@ Open milestone 01.
 
     def test_selected_validation_ignores_other_units_mid_publish(self) -> None:
         (self.workspace / "course" / "en" / "milestones" / "02-stage.md").unlink()
+        for language in ("zh-CN", "en"):
+            milestone = self.workspace / "course" / language / "milestones" / "01-stage.md"
+            milestone.write_text(
+                render_artifact("milestone-01", language, V3_MILESTONE_HEADINGS[language]),
+                encoding="utf-8",
+            )
         selected = [
             "course/zh-CN/milestones/01-stage.md",
             "course/en/milestones/01-stage.md",
@@ -475,6 +593,17 @@ Open milestone 01.
 
         self.assertTrue(any("commands differ" in error for error in errors))
 
+    def test_schema3_practice_ids_must_match_across_languages(self) -> None:
+        self.upgrade_to_schema3()
+        zh = self.workspace / "course" / "zh-CN" / "milestones" / "01-stage.md"
+        en = self.workspace / "course" / "en" / "milestones" / "01-stage.md"
+        zh.write_text(zh.read_text(encoding="utf-8") + "practice_id: m01-p01\n", encoding="utf-8")
+        en.write_text(en.read_text(encoding="utf-8") + "practice_id: m01-p02\n", encoding="utf-8")
+
+        errors = validate_workspace(self.workspace)
+
+        self.assertTrue(any("practice IDs differ" in error for error in errors))
+
     def test_inference_cannot_borrow_confidence_from_later_evidence(self) -> None:
         project_map = self.workspace / "course" / "en" / "project-map.md"
         text = project_map.read_text(encoding="utf-8").replace("confidence: medium\n\n", "")
@@ -494,6 +623,27 @@ Open milestone 01.
         errors = validate_workspace(self.workspace)
 
         self.assertTrue(any("invalid course_status: unknown" in error for error in errors))
+
+    def test_course_and_unit_status_vocabularies_are_separate(self) -> None:
+        progress_path = self.workspace / "progress.json"
+        progress = json.loads(progress_path.read_text(encoding="utf-8"))
+        progress["course_status"] = "passed"
+        progress["milestones"][0]["status"] = "complete"
+        progress_path.write_text(json.dumps(progress), encoding="utf-8")
+
+        errors = validate_workspace(self.workspace)
+
+        self.assertIn("invalid course_status: passed", errors)
+        self.assertIn("milestones[0] has invalid status: complete", errors)
+
+    def test_milestone_filename_numbers_must_be_consecutive(self) -> None:
+        for language in ("zh-CN", "en"):
+            source = self.workspace / "course" / language / "milestones" / "02-stage.md"
+            source.rename(source.with_name("06-stage.md"))
+
+        errors = validate_workspace(self.workspace)
+
+        self.assertIn("milestone filename numbers must be consecutive from 1", errors)
 
     def test_missing_artifact_id_is_reported(self) -> None:
         roadmap = self.workspace / "course" / "en" / "roadmap.md"

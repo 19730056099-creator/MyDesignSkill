@@ -21,9 +21,29 @@ language: en
 
 {{small_example}}
 
+## First Touch
+
+practice_id: {{practice_id}}
+manual_action_id: {{manual_action_id}}
+
+{{first_touch}}
+
 ## Hands-on Exercise
 
 {{exercise}}
+
+## AI Usage Boundary
+
+ai_boundary_id: {{ai_boundary_id}}
+
+{{ai_boundary}}
+
+## Understanding and Transfer Check
+
+transfer_check_id: {{transfer_check_id}}
+reappears_in: {{reappears_in}}
+
+{{understanding_and_transfer}}
 
 ## Exit Criteria
 

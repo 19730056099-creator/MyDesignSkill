@@ -21,9 +21,29 @@ language: zh-CN
 
 {{small_example}}
 
+## 首次触摸
+
+practice_id: {{practice_id}}
+manual_action_id: {{manual_action_id}}
+
+{{first_touch}}
+
 ## 动手练习
 
 {{exercise}}
+
+## AI 使用边界
+
+ai_boundary_id: {{ai_boundary_id}}
+
+{{ai_boundary}}
+
+## 理解与迁移检查
+
+transfer_check_id: {{transfer_check_id}}
+reappears_in: {{reappears_in}}
+
+{{understanding_and_transfer}}
 
 ## 通过标准
 

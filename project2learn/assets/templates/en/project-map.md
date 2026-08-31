@@ -17,6 +17,14 @@ language: en
 
 {{subsystems}}
 
+## Technology Layer Map
+
+{{technology_layers}}
+
+## Troubleshooting Map
+
+{{troubleshooting_map}}
+
 ## Evidence Ledger
 
 {{evidence_ledger}}

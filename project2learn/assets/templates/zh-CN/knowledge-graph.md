@@ -20,3 +20,7 @@ language: zh-CN
 ## 最小练习
 
 {{minimal_exercises}}
+
+## 螺旋复现与理解深度
+
+{{spiral_recurrence_and_depth}}

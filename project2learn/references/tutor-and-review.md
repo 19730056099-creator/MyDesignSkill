@@ -6,13 +6,13 @@ Use this protocol for resume, readiness, foundation learning, hints, review, ski
 
 Read `progress.json` first.
 
-For schema v2, follow `current_unit`:
+For schema v2 or v3, follow `current_unit`:
 
 - `assessment`: summarize only unresolved project-relevant calibration choices and ask the smallest useful question batch;
 - `foundation`: read both localized foundation files and summarize its exit criteria;
 - `milestone`: read both localized milestone files and summarize its objective and acceptance.
 
-Confirm paired `artifact_id` values match. For schema v1, preserve the active milestone and use the migration guidance in `learner-readiness.md` before the next unstarted milestone.
+Confirm paired `artifact_id` values match. Preserve schema-v1/v2 active work and use the migration guidance in `learner-readiness.md` before the next unstarted unit; never invent prior practice evidence.
 
 Do not update progress merely because a conversation occurred. Update it after an assessment answer, observable work, a review verdict, a hint request, a route choice, or an explicit skip/waiver.
 
@@ -21,11 +21,11 @@ Do not update progress merely because a conversation occurred. Update it after a
 Use this loop before finalizing a personalized route:
 
 ```text
-project competency DAG → known learner facts → short calibration choice →
+project competency DAG → known learner facts → readiness and learning-mode choices →
 learner evidence → gap closure → foundation route → first current unit
 ```
 
-Offer `assume_beginner`, short calibration, and explicit waiver. Prefer capability questions and tiny diagnostics over labels such as beginner/intermediate/expert. Reuse information already supplied. Do not ask about technologies outside the selected path.
+Offer `assume_beginner`, short calibration, and explicit waiver. Also select `product_builder`, `cs_depth`, or `balanced` from the learner's goal. Prefer capability questions and tiny diagnostics over labels such as beginner/intermediate/expert. Reuse information already supplied. Do not ask about technologies outside the selected path.
 
 When evidence changes a competency:
 
@@ -39,13 +39,13 @@ When evidence changes a competency:
 For both foundation and milestone units, use:
 
 ```text
-brief → learner attempt → observe evidence → targeted question/hint →
-learner revision → review → next available unit
+first touch → observable result → minimal explanation → learner-owned practice →
+explain/debug/transfer → review → next available unit
 ```
 
 Ask one useful question at a time. Prefer questions tied to behavior the learner can observe. When the learner already demonstrates understanding, move forward instead of repeating Socratic prompts.
 
-A foundation brief emphasizes the exit capability and project bridge. A milestone brief emphasizes observable project value and design pressure. Do not turn a foundation into a generic survey course.
+A foundation brief emphasizes the exit capability and project bridge. A milestone brief emphasizes observable project value and design pressure. Before work begins, state what AI may generate, what the learner must do manually, and what they must explain. Do not turn a foundation into a generic survey course.
 
 ## 4. Hint ladder
 
@@ -55,7 +55,7 @@ A foundation brief emphasizes the exit capability and project bridge. A mileston
 - **Hint 4 — Pseudocode:** Provide pseudocode, a partial interface, or a focused code fragment.
 - **Hint 5 — Reference:** Provide a reference implementation or the smallest complete answer needed to unblock progress.
 
-Start at Hint 1 by default. If the learner explicitly asks for explanation, pseudocode, or the answer, jump to the requested level. Record `unit_id`, unit kind, hint level, reason, and timestamp in schema-v2 `hint_history`. Continue accepting legacy `milestone_id` hint records in schema-v1 workspaces.
+Start at Hint 1 by default. If the learner explicitly asks for explanation, pseudocode, or the answer, jump to the requested level. Record `unit_id`, unit kind, hint level, reason, and timestamp in schema-v2+ `hint_history`. A Hint 5 reference may reduce implementation effort but does not waive the unit's learner-owned practice or explanation check. Continue accepting legacy `milestone_id` hint records in schema-v1 workspaces.
 
 ## 5. Readiness gate before a milestone
 
@@ -81,7 +81,7 @@ For a foundation unit, report:
 5. required changes versus optional practice;
 6. verdict: `passed`, `needs_revision`, or `skipped_with_risk`.
 
-When a foundation passes, mark its competencies `ready` with `evidence_level: demonstrated` and record `student_work` or `diagnostic_task` evidence.
+When a schema-v3 foundation passes, record one `practice_evidence` entry with the manual action, observable result, explanation, AI usage, timestamp, and achieved practice depth. Then mark its competencies `ready` with `evidence_level: demonstrated` and record `student_work` or `diagnostic_task` evidence.
 
 For a project milestone, report:
 
@@ -94,7 +94,7 @@ For a project milestone, report:
 7. required changes, separated from optional improvements;
 8. verdict: `passed`, `needs_revision`, or `skipped_with_risk`.
 
-Do not fail an early implementation solely because it lacks a later-stage mechanism. Do not reward code that bypasses the unit's learning constraint even if it produces the right output.
+Do not fail an early implementation solely because it lacks a later-stage mechanism. Do not reward code that bypasses the unit's learning constraint even if it produces the right output. For schema v3, a passing milestone needs direct practice evidence as well as behavioral acceptance; generated code running successfully is not sufficient by itself.
 
 ## 7. State transitions
 

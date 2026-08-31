@@ -17,6 +17,14 @@ language: zh-CN
 
 {{subsystems}}
 
+## 技术层级地图
+
+{{technology_layers}}
+
+## 故障定位地图
+
+{{troubleshooting_map}}
+
 ## 证据台账
 
 {{evidence_ledger}}

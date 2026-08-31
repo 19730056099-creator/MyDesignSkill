@@ -38,7 +38,7 @@ Repository: {repository}
 
 def initial_progress(reference: Path, revision: str = "") -> dict:
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "repository": {
             "name": reference.name,
             "source": str(reference),
@@ -50,11 +50,13 @@ def initial_progress(reference: Path, revision: str = "") -> dict:
         "current_milestone": 0,
         "learner_profile": {
             "assessment_mode": "pending",
+            "learning_mode": "pending",
             "goals": [],
             "constraints": [],
             "competencies": [],
         },
         "assessment_history": [],
+        "practice_evidence": [],
         "foundation_units": [],
         "milestones": [],
         "hint_history": [],

@@ -51,14 +51,14 @@
       ],
       "expectations": [
         "The response does not claim the learner is ready for milestone 1.",
-        "It offers assume_beginner, a short calibration, and explicit waiver with risk.",
+        "It offers assume_beginner, a short calibration, and explicit waiver with risk, plus product_builder, cs_depth, and balanced learning modes.",
         "It asks capability-based questions only about prerequisites used by the selected Python CLI path.",
         "It keeps course_status analyzing, learning_phase assessing, current_unit readiness, and current_milestone 0."
       ]
     },
     {
       "id": 8,
-      "prompt": "我完全不会这个 Go 项目用到的技术，别测试我，直接按零基础处理。但不要让我先学一整套 Go 和网络编程课程，只安排完成这个 TCP KV 项目需要的前置内容，并说明为什么学习顺序是这样。",
+      "prompt": "我完全不会这个 Go 项目用到的技术，别测试我，直接按零基础和 cs_depth 模式处理。但不要让我先学一整套 Go 和网络编程课程，只安排完成这个 TCP KV 项目需要的前置内容，并说明为什么学习顺序是这样。",
       "expected_output": "An assume-beginner readiness decision with a topologically ordered, just-enough foundation route linked to project milestones and no generic full-course detour.",
       "files": [
         "evals/fixtures/infra-loop/README.md",
@@ -71,7 +71,8 @@
         "The learner's no-quiz request is honored as assessment_mode assume_beginner.",
         "The prerequisite route includes transitive dependencies and is ordered before the first milestone that requires them.",
         "Each foundation is linked to competency IDs and required_by milestone IDs.",
-        "The response explicitly excludes unrelated Go and networking syllabus content."
+        "The response explicitly excludes unrelated Go and networking syllabus content.",
+        "Each planned unit states first touch, AI allowance, learner-owned critical practice, and an explanation or transfer check."
       ]
     }
   ]

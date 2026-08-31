@@ -8,7 +8,7 @@
 **Project2Learn**：把一个成熟的本地或 GitHub 代码仓库，转换为一门「从零重建
 （from-zero reconstruction）」的双语（zh-CN / en）项目式课程。
 
-核心思想：**逆向推导教学顺序 + 学习者准备度校准** —— 从成熟能力倒推出项目所需能力、传递性前置知识、工程压力和最简劣化设计；再确认学习者真正掌握了什么，只为缺口生成短小的前置补给单元，最后正向排成 5–12 个可运行的项目里程碑。注意：教学序列 ≠ 作者真实的开发历史，不得如此声称。
+核心思想：**逆向推导教学顺序 + 学习者准备度/模式校准 + Touch→Understand→Own** —— 从成熟能力倒推出项目所需能力、技术/故障地图、传递性前置知识、工程压力和最简劣化设计；再确认学习者真正掌握了什么及其 `product_builder`、`cs_depth` 或 `balanced` 模式，只为缺口生成短小补给，并在每个单元明确首次触摸、AI 边界、亲手关键实践、解释/迁移检查，最后正向排成 5–12 个可运行里程碑。教学序列 ≠ 作者真实开发历史。
 
 **触发场景**：用户想通过重建仓库学习、要求把源码转为课程、继续已有学习工作区、
 要里程碑提示、提交实现请求评审。普通代码解释 / 修 bug / 仓库摘要不触发本 skill。
@@ -71,6 +71,9 @@ project2learn/
 5. **阶段感知评审**：早期简单设计只要满足当前单元即可通过，不因缺少后期机制而挂科；但绕过学习约束的取巧代码即使输出正确也不给过。
 6. **不得假设水平**：项目知识图谱不等于学习者已掌握。最终个性化路线前必须让用户选择按零基础、短校准或显式豁免；学习者证据与仓库证据分开记录。
 7. **只补项目所需子集**：递归展开前置依赖，但只生成当前路线需要的 10–30 分钟补给单元；补给不计入 5–12 个项目里程碑。
+8. **先触摸再理解**：先给场景、最小操作和可观察结果，再解释原理；重要能力按 touched→explained→debugged→transferred 螺旋复现。
+9. **AI 降成本、不替代学习**：每个单元声明 AI 可生成内容、学习者必须亲手完成的关键动作/代码及必须解释的机制；工作代码本身不等于掌握。
+10. **先建地图**：`project-map.md` 必须提供技术层级和最小故障定位路径，让学习者知道代码、命令、进程、网络和存储分别在哪一层。
 
 ## 5. 新课程工作流（线性模式）
 
@@ -79,11 +82,11 @@ project2learn/
 3. `python <skill-dir>/scripts/init_workspace.py --reference ... --output-root ... --revision ...`
 4. 按 repository-analysis.md 盘点仓库，选定一条主端到端路径（monorepo 先低分辨率全图再显式裁剪）。
 5. 形成语言中立仓库模型与项目所需能力 DAG：稳定 competency ID、类别、传递依赖、阻塞性、required_by、微诊断和证据。
-6. 复用用户已说明的水平，让用户选择 `assume_beginner`、3–7 个项目相关的短校准，或显式豁免并记录风险；等待必要答案时保持 analyzing、current_milestone 0。
+6. 复用用户已说明的水平，让用户选择 `assume_beginner`、3–7 个项目相关的短校准，或显式豁免并记录风险；同时按目标选择 `product_builder`、`cs_depth` 或 `balanced`。等待必要答案时保持 analyzing、current_milestone 0。
 7. 计算个人缺口，按拓扑生成 0–8 个短前置补给；只前置里程碑 1 所需内容，后续依赖及时补。
 8. 按 reconstruction-method.md 建立语言中立的演变模型，重建 5–12 个因果相连的项目里程碑；补给单元不占里程碑数量。
 9. 按 output-contract.md 渲染双语 project-map / architecture / knowledge-graph / readiness / project-evolution / roadmap、foundation 与 milestone，以及 `GETTING_STARTED.md`。
-10. 填充 schema-v2 learner_profile、foundation、milestone 与 current_unit，保持 analyzing。
+10. 填充 schema-v3 learner_profile（含 learning_mode 和 practice_depth）、practice_evidence、foundation、milestone 与 current_unit，保持 analyzing。
 11. 运行 `validate_course.py`，修复错误直至通过。
 12. 通过后置 ready：若里程碑 1 有缺口，current_unit 指向第一个 foundation 且 current_milestone 0；否则指向 milestone-01 且 current_milestone 1。再跑完整校验。
 13. 汇报范围、校准决策、补给/里程碑数、不确定项、双语 readiness/roadmap 路径和第一个动作。
@@ -102,7 +105,7 @@ project2learn/
 3. Render：把 project-map / architecture / knowledge-graph / readiness / project-evolution / roadmap 及所有 unit-def 合并给一个双语 writer；演变文档与 milestone-def 共用同一因果链。
 4. Foundations：0–6 个补给只依赖 Render 和自己的 foundation-def；文件可并行生成，学习顺序由 DAG 和 progress 控制。
 5. Milestones：7–12 个项目里程碑只依赖 Render 和自己的 milestone-def，不得彼此串联，必须一波并行。
-6. Finalize：唯一共享状态写者；生成 `GETTING_STARTED.md`、聚合 schema-v2 状态、选择第一个 foundation 或 milestone 并完整校验。
+6. Finalize：唯一共享状态写者；生成双语 `GETTING_STARTED.md`、聚合 schema-v3 状态、选择第一个 foundation 或 milestone 并完整校验。
 
 执行者只接收 ≤500 词 brief、自己的任务切片、声明输入和上游 handoff；用
 `validate_course.py <workspace> --partial --only <声明输出>...` 隔离自验，避免并行发布时
@@ -119,7 +122,7 @@ plan/finalize；未提供时会退回运行时默认模型，速度不作保证�
 ## 6. 交互工作流（resume/hint/review/status/why）
 
 1. 先读 `progress.json`（双语言共享的唯一状态源）。若参考仓库 revision 变化：保留旧版本、转回 `analyzing`、重新做仓库分析后再辅导。
-2. schema v2 按 `current_unit` 读取 readiness、foundation 或 milestone 双语文件；schema v1 不重置，在下一个未开始里程碑前做渐进迁移。
+2. schema v2/v3 按 `current_unit` 读取双语文件；schema v1/v2 不重置，在下一个未开始单元前渐进补齐 v3 学习模式与实践字段，不伪造历史证据。
 3. 项目里程碑开始前只检查其 blocking + required_by 能力；unknown/needs_refresh 先微诊断或补给，waived 必须有风险记录。
 4. 辅导循环：brief → 学习者尝试 → 观察证据 → 定向提问/提示 → 修改 → 评审 → 下一个可用单元。
    一次只问一个有用的问题；学习者已懂就前进，不重复苏格拉底式追问。
@@ -138,9 +141,9 @@ plan/finalize；未提供时会退回运行时默认模型，速度不作保证�
 ## 7. 完成门槛
 
 - 课程 `ready` = 双语树通过校验 + readiness 决策 + project-evolution 成对且与里程碑因果一致 + 0–8 对补给 + 5–12 对项目里程碑；不代表未来所有前置能力已掌握。
-- Foundation `passed` = 退出能力有可观察证据，并把相关 competency 置为 ready/demonstrated。
+- Foundation `passed` = 退出能力有可观察证据；schema v3 还要记录亲手动作、结果、解释、AI 使用和 practice_depth，再把相关 competency 置为 ready/demonstrated。
 - 里程碑开始 = 其 blocking competency 已 ready 或显式 waived 并记录风险。
-- 里程碑 `passed` = 有具体验收证据。
+- 里程碑 `passed` = 有具体验收证据；schema v3 不能只凭 AI 生成代码运行成功，必须有匹配的 practice_evidence。
 - 课程 `complete` = 所有里程碑 passed 或 skipped_with_risk + 双语仍对齐 +
   最终评审说明学习旅程如何衔接回成熟仓库。
 

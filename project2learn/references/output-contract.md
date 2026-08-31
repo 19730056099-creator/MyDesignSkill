@@ -31,17 +31,18 @@
 └── progress.json
 ```
 
-`readiness.md` is required for new schema-v2 courses. Foundation directories may be empty when the learner is ready for every currently blocking prerequisite. Foundation units are personalized bridges and do not count toward the required 5–12 project milestones.
+`readiness.md` is required for schema-v2 and schema-v3 courses. New workspaces use schema v3. Foundation directories may be empty when the learner is ready for every currently blocking prerequisite. Foundation units are personalized bridges and do not count toward the required 5–12 project milestones.
 
 ## Getting-started guide (mandatory)
 
-`course/GETTING_STARTED.md` is the single entry point for first-time users. It MUST be rendered before the course is marked `ready`, with frontmatter `artifact_id: getting-started` and `language: zh-CN` (or a clearly marked bilingual file). Required headings: Chinese — `学习指南`; `课程是什么`; `文件总览与阅读顺序`; `各文件的用途速查`; `使用规则`; `现在就开始`. English equivalents — `Learning Guide`; `What This Course Is`; `File Overview and Reading Order`; `Quick File Reference`; `Usage Rules`; `Start Now`.
+`course/GETTING_STARTED.md` is the single entry point for first-time users. A schema-v3 course MUST render it before becoming `ready`, with frontmatter `artifact_id: getting-started` and `language: bilingual`. Required headings are `学习指南 / Learning Guide`, `课程是什么 / What This Course Is`, `文件总览与阅读顺序 / File Overview and Reading Order`, `各文件的用途速查 / Quick File Reference`, `使用规则 / Usage Rules`, and `现在就开始 / Start Now`.
 
 Content requirements:
 
-- an explicit numbered reading order including `readiness.md`, any current foundation, `project-evolution.md`, and project milestones;
+- an explicit numbered reading order including `readiness.md`, the technology/troubleshooting sections of `project-map.md`, any current foundation, `project-evolution.md`, and project milestones;
 - a table mapping every file type to its purpose and when to read it, distinguishing `project-evolution.md` (why stages appear) from `roadmap.md` (what to build and in what order);
-- how to answer readiness questions, choose `assume_beginner`, waive with risk, start a unit, request hints, submit review, and check progress;
+- how to answer readiness questions, choose `assume_beginner`, select `product_builder`, `cs_depth`, or `balanced`, waive with risk, start a unit, request hints, submit review, and check progress;
+- how to record direct practice and AI usage without treating an AI-generated successful run as mastery;
 - the learner's concrete first action based on `current_unit`, not an unconditional milestone-01 link;
 - a clear statement that later foundations are introduced just in time rather than front-loaded.
 
@@ -66,30 +67,30 @@ milestone_id: milestone-NN
 verdict: passed|needs_revision|skipped_with_risk
 ```
 
-Foundation completion evidence is stored in schema-v2 learner evidence and foundation status records. The paired review artifact contract below remains specific to project milestones.
+Foundation completion evidence is stored in schema-v2+ learner evidence and foundation status records. Schema v3 additionally requires direct `practice_evidence` for passed units. The paired review artifact contract below remains specific to project milestones.
 
 ## Required course headings
 
 | Artifact | `zh-CN` headings | `en` headings |
 |---|---|---|
-| `project-map.md` | 项目地图；项目目的；核心用户路径；子系统；证据台账；未覆盖范围 | Project Map; Purpose; Core User Journey; Subsystems; Evidence Ledger; Uncovered Scope |
+| `project-map.md` | 项目地图；项目目的；核心用户路径；子系统；技术层级地图；故障定位地图；证据台账；未覆盖范围 | Project Map; Purpose; Core User Journey; Subsystems; Technology Layer Map; Troubleshooting Map; Evidence Ledger; Uncovered Scope |
 | `architecture.md` | 架构；系统上下文；组件；数据流；控制流；关键决策；证据台账 | Architecture; System Context; Components; Data Flow; Control Flow; Key Decisions; Evidence Ledger |
-| `knowledge-graph.md` | 知识图谱；概念依赖；学习优先级；源码位置；最小练习 | Knowledge Graph; Concept Dependencies; Learning Priority; Source Locations; Minimal Exercises |
-| `readiness.md` | 学习准备；项目所需能力；学习者基线；差距与决策；前置补给路线；进入项目的条件 | Learning Readiness; Project-Required Competencies; Learner Baseline; Gaps and Decisions; Foundation Route; Entry Conditions |
+| `knowledge-graph.md` | 知识图谱；概念依赖；学习优先级；源码位置；最小练习；螺旋复现与理解深度 | Knowledge Graph; Concept Dependencies; Learning Priority; Source Locations; Minimal Exercises; Spiral Recurrence and Understanding Depth |
+| `readiness.md` | 学习准备；项目所需能力；学习者基线；差距与决策；学习模式与 AI 边界；前置补给路线；进入项目的条件 | Learning Readiness; Project-Required Competencies; Learner Baseline; Gaps and Decisions; Learning Mode and AI Boundary; Foundation Route; Entry Conditions |
 | `project-evolution.md` | 项目演变；最终问题与成熟能力；最小可用起点；演变总览；阶段因果链；最终架构如何形成；教学路线声明；证据台账 | Project Evolution; Final Problem and Mature Capabilities; Minimum Viable Starting Point; Evolution Overview; Stage Causal Chain; How the Final Architecture Emerges; Teaching-Route Disclaimer; Evidence Ledger |
 | `roadmap.md` | 重构路线；路线原则；里程碑总览；覆盖范围；教学性推断 | Reconstruction Roadmap; Roadmap Principles; Milestone Overview; Coverage; Teaching Inferences |
 
-Use one `#` for the first heading and `##` for the remaining headings.
+Use one `#` for the first heading and `##` for the remaining headings. In schema v3, pair project-map entries with stable `layer_id` and `failure_id` lines; readiness uses the same `learning_mode`; knowledge-graph recurrence uses matching `practice_depth` and `reappears_in` lines.
 
 ## Foundation headings
 
-Chinese: `前置补给单元`, `为什么现在需要`, `依赖`, `最小概念`, `小例子`, `动手练习`, `通过标准`, `项目桥接`, `暂不学习`, `完成结论`.
+Chinese: `前置补给单元`, `为什么现在需要`, `依赖`, `最小概念`, `小例子`, `首次触摸`, `动手练习`, `AI 使用边界`, `理解与迁移检查`, `通过标准`, `项目桥接`, `暂不学习`, `完成结论`.
 
-English: `Foundation Unit`, `Why It Is Needed Now`, `Dependencies`, `Minimal Concepts`, `Small Example`, `Hands-on Exercise`, `Exit Criteria`, `Project Bridge`, `Not Learning Yet`, `Completion Decision`.
+English: `Foundation Unit`, `Why It Is Needed Now`, `Dependencies`, `Minimal Concepts`, `Small Example`, `First Touch`, `Hands-on Exercise`, `AI Usage Boundary`, `Understanding and Transfer Check`, `Exit Criteria`, `Project Bridge`, `Not Learning Yet`, `Completion Decision`.
 
-Use matching IDs such as `foundation-01`, filenames such as `F01-java-minimum.md`, competency lines such as `competency_id: language.java.classes`, affected milestone lines such as `required_by: milestone-01`, and acceptance IDs such as `f01-a01`. Commands and technical tokens remain identical across languages.
+Use matching IDs such as `foundation-01`, filenames such as `F01-java-minimum.md`, competency lines such as `competency_id: language.java.classes`, affected milestone lines such as `required_by: milestone-01`, and acceptance IDs such as `f01-a01`. Schema-v3 practice uses stable `practice_id`, `manual_action_id`, `ai_boundary_id`, `transfer_check_id`, and optional `reappears_in` lines. Commands, IDs, and technical tokens remain identical across languages.
 
-Every foundation must explain what the learner does **not** need to study yet. The exit criteria must be observable and normally completable without copying the mature project implementation.
+Every foundation must explain what the learner does **not** need to study yet. `First Touch` gives a minimal scene, action, and immediate result before full explanation. The AI boundary distinguishes generated scaffolding from manual critical practice and required explanation. The transfer check changes at least one detail. Exit criteria must be observable and normally completable without copying the mature implementation.
 
 ## Project-evolution artifact
 
@@ -97,13 +98,13 @@ Create it from the language-neutral evolution model, not by expanding one locali
 
 ## Milestone headings
 
-Chinese: `里程碑`, `当前版本`, `上一版本解决了什么`, `用户遇到的新问题`, `本阶段引入什么`, `目标`, `可观察结果`, `本阶段解决什么`, `范围`, `暂时不解决什么`, `前置知识`, `任务`, `验收`, `提示 1` through `提示 5`, `下一阶段为什么会出现`, `源码桥接`, `证据台账`, `完成结论`.
+Chinese: `里程碑`, `当前版本`, `上一版本解决了什么`, `用户遇到的新问题`, `本阶段引入什么`, `目标`, `可观察结果`, `本阶段解决什么`, `范围`, `暂时不解决什么`, `前置知识`, `首次触摸`, `任务`, `AI 使用边界`, `理解与迁移检查`, `验收`, `提示 1` through `提示 5`, `下一阶段为什么会出现`, `源码桥接`, `证据台账`, `完成结论`.
 
-English: `Milestone`, `Current Version`, `What the Previous Version Solved`, `New User Problem`, `What This Stage Introduces`, `Goal`, `Observable Result`, `What This Stage Solves`, `Scope`, `Not Solving Yet`, `Prerequisites`, `Tasks`, `Acceptance`, `Hint 1` through `Hint 5`, `Why the Next Stage Appears`, `Source Bridge`, `Evidence Ledger`, `Completion Decision`.
+English: `Milestone`, `Current Version`, `What the Previous Version Solved`, `New User Problem`, `What This Stage Introduces`, `Goal`, `Observable Result`, `What This Stage Solves`, `Scope`, `Not Solving Yet`, `Prerequisites`, `First Touch`, `Tasks`, `AI Usage Boundary`, `Understanding and Transfer Check`, `Acceptance`, `Hint 1` through `Hint 5`, `Why the Next Stage Appears`, `Source Bridge`, `Evidence Ledger`, `Completion Decision`.
 
 Milestone 1 compares against the minimum viable starting point from `project-evolution.md`; later milestones compare against the preceding milestone's accepted observable result. Keep causal sections concrete and short rather than repeating the task list.
 
-Use matching milestone IDs such as `milestone-01`, filenames such as `01-minimal-value.md`, competency lines such as `competency_id: domain.http.request-response`, optional foundation links such as `foundation_id: foundation-02`, and acceptance IDs such as `m01-a01`.
+Use matching milestone IDs such as `milestone-01`, filenames such as `01-minimal-value.md`, competency lines such as `competency_id: domain.http.request-response`, optional foundation links such as `foundation_id: foundation-02`, acceptance IDs such as `m01-a01`, and matching schema-v3 `practice_id`, `manual_action_id`, `ai_boundary_id`, `transfer_check_id`, and `reappears_in` lines.
 
 ## Review headings
 
@@ -128,13 +129,13 @@ rationale: concise explanation
 
 Learner mastery evidence belongs in `progress.json`, not this ledger. Its types are `learner_statement`, `diagnostic_task`, `student_work`, or `explicit_waiver`.
 
-## Progress state: schema v2
+## Progress state: schema v3
 
-New workspaces use UTF-8 schema-v2 JSON with English, language-neutral keys:
+New workspaces use UTF-8 schema-v3 JSON with English, language-neutral keys:
 
 ```json
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "repository": {"name": "", "source": "", "revision": ""},
   "course_status": "analyzing",
   "learning_phase": "assessing",
@@ -142,11 +143,13 @@ New workspaces use UTF-8 schema-v2 JSON with English, language-neutral keys:
   "current_milestone": 0,
   "learner_profile": {
     "assessment_mode": "pending",
+    "learning_mode": "pending",
     "goals": [],
     "constraints": [],
     "competencies": []
   },
   "assessment_history": [],
+  "practice_evidence": [],
   "foundation_units": [],
   "milestones": [],
   "hint_history": [],
@@ -157,11 +160,11 @@ New workspaces use UTF-8 schema-v2 JSON with English, language-neutral keys:
 }
 ```
 
-Allowed `learning_phase` values: `assessing`, `foundations`, `milestones`, `complete`.
+Allowed `course_status` values are `analyzing`, `ready`, `in_progress`, and `complete`. Unit status values are `ready`, `in_progress`, `needs_revision`, `passed`, and `skipped_with_risk`. Allowed `learning_phase` values are `assessing`, `foundations`, `milestones`, and `complete`.
 
-Allowed `current_unit.kind` values: `assessment`, `foundation`, `milestone`. `current_unit` is null only after completion. Keep `current_milestone: 0` while assessment or a foundation is current; set it to the active project milestone number when `current_unit.kind` is `milestone`.
+Allowed `current_unit.kind` values are `assessment`, `foundation`, and `milestone`. `current_unit` is null only after completion. Keep `current_milestone: 0` while assessment or a foundation is current; set it to the active project milestone number when `current_unit.kind` is `milestone`.
 
-Allowed learner `assessment_mode` values: `pending`, `assume_beginner`, `self_report`, `micro_diagnostic`, `mixed`, `waived`.
+Allowed learner `assessment_mode` values are `pending`, `assume_beginner`, `self_report`, `micro_diagnostic`, `mixed`, and `waived`. Allowed `learning_mode` values are `pending`, `product_builder`, `cs_depth`, and `balanced`. An active schema-v3 course cannot keep either decision pending.
 
 Each competency record contains:
 
@@ -171,6 +174,7 @@ Each competency record contains:
   "category": "language",
   "state": "unknown",
   "evidence_level": "none",
+  "practice_depth": "unseen",
   "prerequisites": [],
   "required_by": ["milestone-01"],
   "blocking": true,
@@ -178,18 +182,20 @@ Each competency record contains:
 }
 ```
 
-Allowed competency states: `unknown`, `ready`, `needs_refresh`, `learning`, `waived`. Allowed evidence levels: `none`, `self_reported`, `demonstrated`, `waived`. Competency prerequisites must form an acyclic graph. A `ready` competency requires self-reported or demonstrated evidence; a `waived` competency requires waiver evidence.
+Allowed competency states are `unknown`, `ready`, `needs_refresh`, `learning`, and `waived`. Practice depth progresses through `unseen`, `touched`, `explained`, `debugged`, and `transferred`; do not advance it merely because AI generated working code. Allowed evidence levels are `none`, `self_reported`, `demonstrated`, and `waived`.
 
-Each learner evidence record contains `type`, `summary`, and `timestamp`. Each assessment-history record contains `mode`, `summary`, and `timestamp`; a schema-v2 course cannot become active while `assessment_mode` is `pending` or assessment history is empty. Each foundation record contains `id`, `number`, `status`, `competencies`, `required_by`, `acceptance`, and `risk_notes`. Each milestone record retains `id`, `number`, `status`, `acceptance`, and `risk_notes`.
+Each schema-v3 `practice_evidence` record contains `unit_id`, `depth`, `manual_action`, `observable_result`, `explanation`, `ai_usage`, and `timestamp`. A passed foundation or milestone requires one matching record. The record documents responsibility and understanding; it is not a percentage of learner-written code.
 
-A milestone may be current only when every blocking competency whose `required_by` includes that milestone is `ready` or explicitly `waived`. Waived blockers must have risk notes.
+Each learner evidence record contains `type`, `summary`, and `timestamp`. Each assessment-history record contains `mode`, `summary`, and `timestamp`. Foundation records contain `id`, `number`, `status`, `competencies`, `required_by`, `acceptance`, and `risk_notes`; milestone records contain `id`, `number`, `status`, `acceptance`, and `risk_notes`.
 
-## Schema-v1 compatibility
+A milestone may be current only when every blocking competency whose `required_by` includes it is `ready` or explicitly `waived`. Waived blockers require risk notes.
 
-The validator continues to accept existing schema-v1 workspaces. Do not silently reset them. Upgrade to schema v2 at a readiness checkpoint before the next not-yet-started milestone, preserving milestone status, hint history, reviews, learner choices, and revision history.
+## Schema-v1/v2 compatibility
+
+The validator continues to accept existing schema-v1 and schema-v2 workspaces. Do not silently reset them. Before the next not-yet-started unit, add the v3 learning-mode and practice fields, initialize unknown practice depth honestly, update future unit templates, and preserve milestone status, hint history, reviews, learner choices, revision history, and existing evidence.
 
 ## Bilingual parity
 
-Both language trees must contain the same core files, foundation filenames, and milestone filenames. Paired artifacts must share stable IDs, repository source locations, commands, competency IDs, readiness states, `required_by` milestone IDs, acceptance item IDs, verdicts, stage order, and the causal meaning of each stage's current version, new problem, introduced change, deferred limit, and next pressure. Natural-language explanations should read idiomatically in each language; code identifiers and technical tokens remain unchanged.
+Both language trees must contain the same core files, foundation filenames, and milestone filenames. Paired artifacts must share stable IDs, repository source locations, commands, competency IDs, readiness states, learning mode, `required_by` milestone IDs, acceptance item IDs, verdicts, stage order, technology/troubleshooting layers, AI boundaries, learner-owned practice meaning, transfer checks, and the causal meaning of each stage's current version, new problem, introduced change, deferred limit, and next pressure. Natural-language explanations should read idiomatically in each language; code identifiers and technical tokens remain unchanged.
 
 Run `scripts/validate_course.py` before setting a course to `ready` or `complete`.

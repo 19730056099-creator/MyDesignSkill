@@ -17,6 +17,12 @@ language: en
 
 {{gaps_and_decisions}}
 
+## Learning Mode and AI Boundary
+
+learning_mode: {{learning_mode}}
+
+{{learning_mode_and_ai_boundary}}
+
 ## Foundation Route
 
 {{foundation_route}}

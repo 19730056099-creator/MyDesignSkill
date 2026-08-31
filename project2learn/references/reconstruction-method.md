@@ -18,6 +18,7 @@ Before localized rendering, create one language-neutral evolution model with:
 - `mature_problem` and `mature_capabilities`;
 - `minimum_viable_start`: the smallest runnable V0 that provides observable value without the final architecture;
 - `stages`: ordered records containing `id`, `current_version`, `previous_value`, `new_problem`, `introduced_change`, `resolved_pressure`, `deferred_limit`, `next_pressure`, `source_bridge`, and typed evidence;
+- `practice_design`: for each foundation and milestone, `first_touch`, `manual_actions`, `ai_allowed`, `must_explain`, `transfer_check`, and `reappears_in`;
 - `architecture_growth`: which responsibilities or boundaries appear only after their pressure becomes visible;
 - `route_disclaimer`: the evidence-backed statement that this is a teaching route rather than verified commit history.
 
@@ -40,14 +41,17 @@ Every milestone needs:
 - the mechanism introduced now, what it solves, and why it is no earlier than necessary;
 - explicit scope and what remains deliberately unsolved;
 - stable competency IDs for prerequisites introduced just in time, with blocking status and any foundation-unit bridge;
+- a first-touch action that produces an observable result before abstraction-heavy explanation;
 - implementation tasks that leave design choices to the learner;
-- concrete acceptance evidence;
+- an explicit AI boundary: generated scaffolding allowed, critical manual actions/code, and required explanation;
+- a transfer or debugging check that changes one detail instead of repeating the demonstrated example;
+- concrete acceptance evidence, including direct practice evidence for passed schema-v3 units;
 - five progressively revealing hint levels;
 - the next pressure that motivates the following stage, using the same causal meaning as that following stage's new problem;
 - a source bridge to relevant mature-project files or symbols;
 - an evidence ledger and completion decision.
 
-Introduce an abstraction only when the learner has encountered the pressure it resolves. Avoid teaching a final architecture as ceremony.
+Introduce an abstraction only when the learner has encountered the pressure it resolves. Avoid teaching a final architecture as ceremony. Recur important competencies rather than reteaching them: first touch the behavior, later explain it, diagnose it under failure, and finally transfer it to a changed context when the selected route justifies that depth.
 
 ## 4. Useful stage patterns
 
@@ -71,6 +75,8 @@ Revise the route when it:
 - introduces several major concepts in one stage;
 - cannot be accepted with evidence;
 - requires a language, framework, domain, or tooling capability that is neither ready, explicitly waived, nor supplied by a just-in-time foundation unit;
+- allows AI to complete the concept-bearing practice while acceptance checks only that generated output runs;
+- starts with theory or framework setup when a smaller first-touch action could create the needed intuition;
 - sends a learner to a broad external course instead of teaching the minimal project-relevant prerequisite subset;
 - treats the mature implementation as the only valid solution;
 - claims certainty about motivation not documented by the repository;

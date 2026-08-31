@@ -17,6 +17,12 @@ language: zh-CN
 
 {{gaps_and_decisions}}
 
+## 学习模式与 AI 边界
+
+learning_mode: {{learning_mode}}
+
+{{learning_mode_and_ai_boundary}}
+
 ## 前置补给路线
 
 {{foundation_route}}

@@ -45,9 +45,29 @@ language: zh-CN
 
 {{prerequisites}}
 
+## 首次触摸
+
+practice_id: {{practice_id}}
+manual_action_id: {{manual_action_id}}
+
+{{first_touch}}
+
 ## 任务
 
 {{tasks}}
+
+## AI 使用边界
+
+ai_boundary_id: {{ai_boundary_id}}
+
+{{ai_boundary}}
+
+## 理解与迁移检查
+
+transfer_check_id: {{transfer_check_id}}
+reappears_in: {{reappears_in}}
+
+{{understanding_and_transfer}}
 
 ## 验收
 

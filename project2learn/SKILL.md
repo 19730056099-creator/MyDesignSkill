@@ -1,6 +1,6 @@
 ---
 name: project2learn
-description: Turn a mature local or GitHub code repository into a synchronized Chinese/English, evidence-grounded, personalized from-zero reconstruction course. Diagnose the learner's project-relevant technical level, build transitive prerequisite bridges, then guide runnable milestones with progressive hints, stage-aware review, and persistent progress. Use whenever a user wants to learn by rebuilding a repository, reverse-engineer how a project could be constructed, convert source into a project course, assess readiness for such a course, continue a Project2Learn workspace, request milestone or foundation help, or review a stage implementation—not for an ordinary repository summary.
+description: Turn a mature local or GitHub code repository into a synchronized Chinese/English, evidence-grounded, personalized from-zero reconstruction course. Build a technology and troubleshooting map, diagnose project-relevant readiness and learning mode, introduce knowledge when project pressure makes it useful, and separate AI-assisted mechanical work from the learner's required hands-on practice, explanation, debugging, and transfer. Use whenever a user wants to learn by rebuilding a repository, reverse-engineer how a project could be constructed, convert source into a project course, assess readiness for such a course, continue a Project2Learn workspace, request milestone or foundation help, or review a stage implementation—not for an ordinary repository summary.
 compatibility: Requires filesystem read access to the reference repository, write access to a separate learning workspace, Python 3 for bundled scripts, and network permission only when a remote repository must be fetched.
 ---
 
@@ -19,6 +19,10 @@ Reconstruct the learning journey behind a mature repository and personalize the 
 - Reveal answers gradually. Start with the lowest useful hint, but honor an explicit request for a deeper hint or reference implementation.
 - Review the learner against the current foundation or milestone. A simple early design may pass even when the mature project later replaces it.
 - Explain every milestone as a causal evolution: previous value → new problem → introduced change → resolved pressure → deferred limit → next pressure. Keep this teaching reconstruction distinct from verified project history.
+- Use `touch → understand → own`: first create a small observable encounter, then explain the mechanism, then require the learner to perform, explain, debug, or transfer the critical part.
+- Build a minimal technology-layer and troubleshooting map before deep detail so the learner can place generated code, commands, data, and failures in the system.
+- Declare an AI boundary for every new foundation and milestone. AI may reduce mechanical implementation cost, but it must not replace the learner's required manual action, explanation, or acceptance evidence.
+- Select `product_builder`, `cs_depth`, or `balanced` learning mode from the learner's goal. Treat any 80/20 coding split as a heuristic, never a fixed quota.
 
 ## Route the request
 
@@ -52,16 +56,17 @@ Ordinary code explanation, bug fixing, feature implementation, generic code revi
    ```
 
 4. Read `references/repository-analysis.md`. Inventory the repository, select a primary end-to-end path, and form a language-neutral repository model. For a monorepo or oversized project, map the whole at low resolution and explicitly scope one learning track.
-5. Read `references/learner-readiness.md`. Build the project-required competency DAG, including transitive tooling, language, framework, domain, and project-concept prerequisites. Record what each competency unlocks and why the selected path needs it.
-6. Calibrate before finalizing the personalized route.
+5. Read `references/learner-readiness.md`. Build the project-required competency DAG, including transitive tooling, language, framework, domain, and project-concept prerequisites. Record what each competency unlocks, where it reappears at deeper practice levels, and why the selected path needs it.
+6. Calibrate readiness and learning mode before finalizing the personalized route.
    - Reuse technical-level information already supplied by the learner.
    - Offer `assume_beginner`, a short self-report/micro-diagnostic calibration, or explicit waiver with risk.
+   - Select `product_builder`, `cs_depth`, or `balanced`; infer only from an explicit goal or ask one concise choice.
    - Ask only project-relevant, capability-based questions. Do not issue a generic technology survey.
    - Keep `course_status: analyzing`, `learning_phase: assessing`, and `current_milestone: 0` while awaiting required answers.
 7. Compute the learner-specific prerequisite gap and topological foundation route. Create only units that close required gaps; front-load only those needed for milestone 1 and attach later units just in time.
-8. Read `references/reconstruction-method.md`. Build a language-neutral evolution model and reconstruct 5–12 causally connected project milestones driven by prerequisites and engineering pressure, not directory order or commit chronology. Foundation units do not count toward the 5–12 milestone range.
-9. Read `references/output-contract.md`. Render matching `project-map.md`, `architecture.md`, `knowledge-graph.md`, `readiness.md`, `project-evolution.md`, and `roadmap.md` files, plus paired foundation and milestone files and the mandatory `course/GETTING_STARTED.md`.
-10. Populate schema-v2 language-neutral competency, foundation, milestone, and current-unit records while keeping `course_status: analyzing`.
+8. Read `references/reconstruction-method.md`. Build a language-neutral evolution model and reconstruct 5–12 causally connected project milestones driven by prerequisites and engineering pressure, not directory order or commit chronology. Give each unit a first-touch action, AI boundary, manual critical practice, explanation/transfer check, and later recurrence where useful. Foundation units do not count toward the 5–12 milestone range.
+9. Read `references/output-contract.md`. Render matching `project-map.md`, `architecture.md`, `knowledge-graph.md`, `readiness.md`, `project-evolution.md`, and `roadmap.md` files, plus paired foundation and milestone files and the mandatory bilingual `course/GETTING_STARTED.md`. The project map must include technology layers and a minimal failure-location path.
+10. Populate schema-v3 language-neutral competency, practice-evidence, foundation, milestone, and current-unit records while keeping `course_status: analyzing`.
 11. Validate the staged course:
 
     ```text
@@ -82,11 +87,11 @@ Use fan-out only when the repository has at least about 20 relevant files **and*
 ## Interactive workflow
 
 1. Read `progress.json` first. It is the shared state source for both languages. Resolve the current reference revision; if it differs from the stored non-empty revision, retain the previous revision, transition to `analyzing`, and re-run repository analysis before tutoring resumes.
-2. For schema v2, follow `current_unit`:
+2. For schema v2 or v3, follow `current_unit`:
    - `assessment`: read readiness context and finish only the unresolved calibration;
    - `foundation`: read both localized foundation files and verify IDs/exit criteria;
    - `milestone`: read both localized milestone files and verify IDs/acceptance meaning.
-3. For a schema-v1 workspace, preserve current work. Before the next not-yet-started milestone, follow the migration section of `references/learner-readiness.md`; do not restart the course merely to add a learner model.
+3. Preserve schema-v1/v2 workspaces. Before the next not-yet-started unit, migrate only the fields required by v3 without resetting milestones, reviews, hints, or learner evidence.
 4. Before any milestone begins, gate only the blocking competencies required by that milestone. Offer a diagnostic or foundation unit for unresolved gaps. Honor an explicit waiver and record its risks.
 5. Follow `references/tutor-and-review.md` for tutoring, hints, reviews, skips, and state transitions. Load `references/output-contract.md` before creating or updating review artifacts.
 6. Update paired localized artifacts together. Update `progress.json` once, using language-neutral values. Run the validator after changing course structure, foundation/milestone IDs, learner readiness gates, or completion state.
@@ -104,4 +109,4 @@ Use fan-out only when the repository has at least about 20 relevant files **and*
 
 ## Completion gates
 
-A course is `ready` only when both language trees validate, include the paired project-evolution artifact, contain 5–12 paired milestones, and have a readiness decision. “Ready” means the personalized learning path is ready; it does not imply every future prerequisite is already mastered. A foundation unit passes only with exit evidence. A project milestone may start only when its blocking competencies are ready or explicitly waived with risk. A milestone passes only with acceptance evidence. The course is `complete` only when all milestones are passed or explicitly skipped with risk, both language trees remain aligned, and the final review connects the learner's journey back to the mature repository.
+A schema-v3 course is `ready` only when both language trees validate, include the paired project-evolution artifact, technology/troubleshooting maps, unit AI boundaries, 5–12 paired milestones, and readiness plus learning-mode decisions. “Ready” means the personalized learning path is ready; it does not imply every future prerequisite is already mastered. A foundation unit passes only with exit evidence and, in schema v3, matching direct practice evidence. A project milestone may start only when its blocking competencies are ready or explicitly waived with risk. A schema-v3 milestone passes only with behavioral acceptance plus the learner's manual action, observable result, explanation, AI-usage record, and achieved practice depth. The course is `complete` only when all milestones are passed or explicitly skipped with risk, both language trees remain aligned, and the final review connects the learner's journey back to the mature repository.

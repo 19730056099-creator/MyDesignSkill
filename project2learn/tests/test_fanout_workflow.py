@@ -22,7 +22,7 @@ class FanoutWorkflowContractTests(unittest.TestCase):
         self.assertIn("mode: 'single_required'", self.script)
 
     def test_planner_analyzes_once_and_milestones_are_one_parallel_wave(self) -> None:
-        self.assertIn("language-neutral repository, competency, and project-evolution models", self.script)
+        self.assertIn("technology-layer, troubleshooting, and spiral-practice models", self.script)
         self.assertIn("paired course/<lang>/project-evolution.md", self.script)
         self.assertIn("Do not create a separate analysis execution unit", self.script)
         self.assertIn("depends_on: [render.id]", self.script)
@@ -32,7 +32,16 @@ class FanoutWorkflowContractTests(unittest.TestCase):
         self.assertIn("const learnerProfile = args.learnerProfile || null", self.script)
         self.assertIn("mode: 'assessment_required'", self.script)
         self.assertIn("readiness-gate", self.script)
-        self.assertIn("3-7 short calibration questions", self.script)
+        self.assertIn("3-7 short questions total", self.script)
+        self.assertIn("validLearningMode", self.script)
+        self.assertIn("product_builder", self.script)
+
+    def test_schema3_units_define_touch_and_ai_boundaries(self) -> None:
+        for field in (
+            "first_touch", "manual_actions", "ai_allowed", "must_explain", "transfer_check", "reappears_in"
+        ):
+            self.assertIn(field, self.script)
+        self.assertNotIn("'getting-started']", self.script)
 
     def test_foundations_are_bounded_and_parallel_after_render(self) -> None:
         self.assertIn("foundationUnits.length > 6", self.script)
@@ -61,6 +70,8 @@ class FanoutWorkflowContractTests(unittest.TestCase):
         self.assertIn("≥~20 个相关文件", agents)
         self.assertIn("不得彼此串联", agents)
         self.assertIn("orchestration/unit-status/<ID>.json", agents)
+        self.assertIn("Touch→Understand→Own", agents)
+        self.assertIn("AI 降成本、不替代学习", agents)
 
 
 if __name__ == "__main__":

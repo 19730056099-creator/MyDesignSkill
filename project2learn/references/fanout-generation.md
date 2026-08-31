@@ -23,15 +23,15 @@ cannot accidentally dispatch a large agent fleet for a small repository.
 ## v3 topology
 
 ```text
-Gate        sizing plus learner-readiness gate; missing profile returns assessment_required
-Plan        one strong planner writes repository, competency, learner-gap, and route models
-Render      one consolidated executor writes paired core artifacts + unit definitions
+Gate        sizing plus readiness/learning-mode gate; missing choice returns assessment_required
+Plan        one strong planner writes repository, technology, troubleshooting, competency, practice, learner-gap, and route models
+Render      one consolidated executor writes paired schema-v3 core artifacts + unit definitions
 Foundations 0–6 just-enough prerequisite pairs, independent after Render
 Milestones  7–12 project milestone pairs, independent after Render
 Finalize    one strong writer creates GETTING_STARTED, aggregates state, validates
 ```
 
-The planner performs the full repository analysis itself. Before the workflow is launched, normal skill routing should collect `assume_beginner`, a short calibration result, or an explicit waiver. If a direct invocation lacks that input, one bounded readiness scan returns questions and stops before planning. The consolidated render unit keeps project-map, architecture, knowledge-graph, readiness, project-evolution, and roadmap semantically aligned.
+The planner performs the full repository analysis itself. Before launch, normal routing collects `assume_beginner`, a short calibration result, or an explicit waiver, plus `product_builder`, `cs_depth`, or `balanced`. If a direct invocation lacks either decision, one bounded scan returns questions and stops before planning. The consolidated render unit keeps the technology/troubleshooting map, architecture, knowledge graph, readiness, project evolution, and roadmap semantically aligned.
 
 ## Phase P — analysis and master plan
 
@@ -41,9 +41,9 @@ The planner writes under `<workspace>/orchestration/`:
    naming/layout, read-only reference rule, output budgets, and validator commands.
 2. `brief.md` — at most 500 words; the authoritative executor context.
 3. `plan.json` — machine-readable render and milestone tasks.
-4. `foundation-defs/<FOUNDATION-ID>.json` paths for 0–6 learner-specific prerequisite bridges. Each definition contains competency IDs, dependencies, affected milestone IDs, exit checks, and scope exclusions.
-5. `milestone-defs/<MILESTONE-ID>.json` paths for 7–12 project milestones. Each definition contains title, goal, pressure, competency IDs, acceptance IDs, and key source/API locations.
-6. Initial schema-v2 `progress.json.orchestration` state, preserving the supplied learner profile.
+4. `foundation-defs/<FOUNDATION-ID>.json` paths for 0–6 learner-specific prerequisite bridges. Each definition contains competency IDs, dependencies, affected milestone IDs, exit checks, scope exclusions, first touch, manual action, AI allowance, explanation, transfer check, and recurrence.
+5. `milestone-defs/<MILESTONE-ID>.json` paths for 7–12 project milestones. Each definition contains title, goal, pressure, competency IDs, acceptance IDs, source/API locations, and the same `touch → understand → own` practice fields.
+6. Initial schema-v3 `progress.json.orchestration` state, preserving the supplied learner profile and learning mode while initializing practice depth honestly.
 
 It also writes the language-neutral repository model to:
 
@@ -90,7 +90,7 @@ Files remain the cross-agent memory, but context should be bounded.
 Executor sequence:
 
 1. Read declared inputs and only the source files needed for evidence.
-2. Write declared outputs.
+2. Write declared outputs with first-touch, AI-boundary, learner-owned practice, explanation, and transfer sections.
 3. Run partial validation:
 
    ```text
@@ -145,8 +145,8 @@ dependency.
 One finalizer:
 
 1. Reads artifacts, unit-status files, conventions, and failure ledger.
-2. Creates the course-specific bilingual `course/GETTING_STARTED.md`, pointing to readiness, project evolution, and the actual first unit.
-3. Aggregates the learner profile, competency states, foundation/milestone statuses, attempts, handoffs, and risks into schema-v2 `progress.json` without deleting history.
+2. Creates the course-specific bilingual `course/GETTING_STARTED.md`, pointing to readiness, the technology/troubleshooting map, project evolution, and the actual first unit.
+3. Aggregates the schema-v3 learner profile, learning mode, competency practice depths, empty initial practice evidence, foundation/milestone statuses, attempts, handoffs, and risks without deleting history.
 4. Runs the full validator **without** `--partial` and fixes cross-unit errors.
 5. Sets `course_status: ready` only when all required units are done. When milestone 1 has prerequisite work, it sets the first topologically available foundation as `current_unit` and keeps `current_milestone: 0`; otherwise it selects milestone 1. It then runs full validation again.
 6. Reports scope, readiness decision, foundation/milestone counts, statuses, uncertainties, both readiness/roadmap paths, and the first learner action.

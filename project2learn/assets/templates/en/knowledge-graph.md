@@ -20,3 +20,7 @@ language: en
 ## Minimal Exercises
 
 {{minimal_exercises}}
+
+## Spiral Recurrence and Understanding Depth
+
+{{spiral_recurrence_and_depth}}

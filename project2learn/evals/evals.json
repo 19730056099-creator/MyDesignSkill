@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "我在学 Python，目前只会变量、if、for 和函数，不会命令行参数、文件读写、pytest，也不太会在终端运行项目。请把随附的 Pocket Tasks 仓库转换成 Project2Learn 学习工作区：同时生成中文和英文课程，按我刚才说明的水平直接建档，不要再问泛泛的初中高级；只补这个项目会用到的前置知识，再从最小可运行版本开始，明确区分代码证据、文档证据、教学性推断和学习者证据。不要直接给参考实现。",
+      "prompt": "我在学 Python，目前只会变量、if、for 和函数，不会命令行参数、文件读写、pytest，也不太会在终端运行项目。请把随附的 Pocket Tasks 仓库转换成 Project2Learn 学习工作区：同时生成中文和英文课程，按 balanced 模式和我刚才说明的水平直接建档，不要再问泛泛的初中高级；只补这个项目会用到的前置知识，再从最小可运行版本开始，明确区分代码证据、文档证据、教学性推断和学习者证据。不要直接给参考实现。",
       "expected_output": "A bilingual personalized reconstruction course for the Python CLI, with a learner readiness model, only the required CLI/file/testing foundation bridges, and an evidence-grounded project route whose first current unit is the earliest necessary foundation rather than milestone 1.",
       "files": [
         "evals/fixtures/python-cli/README.md",
@@ -17,13 +17,14 @@
         "The Chinese and English acceptance explanations have equivalent technical meaning.",
         "The route contains 5 to 12 milestones driven by observable engineering pressure rather than directory order.",
         "Teaching inferences include confidence and rationale.",
-        "progress.json uses schema v2, records the supplied learner baseline separately from repository evidence, and points to the first required foundation with current_milestone 0.",
+        "progress.json uses schema v3, records the supplied learner baseline and balanced learning mode separately from repository evidence, initializes practice evidence honestly, and points to the first required foundation with current_milestone 0.",
+        "The project map includes technology layers and a minimal troubleshooting path; each unit states first touch, AI allowance, learner-owned practice, and an explanation or transfer check.",
         "The first response does not reveal the full reference implementation."
       ]
     },
     {
       "id": 2,
-      "prompt": "Turn the attached Tiny Items API into a from-zero Project2Learn course. I am comfortable with JavaScript functions, objects, modules, and npm scripts, but I have never built an HTTP API and do not understand status codes or request concurrency. Treat that as my readiness self-report, ask a micro-diagnostic only if it changes the route, and teach only the missing prerequisites this repository path needs. I want idiomatic English and matching Chinese with one shared progress file. Reconstruct why routing, validation, storage boundaries, and concurrency become necessary.",
+      "prompt": "Turn the attached Tiny Items API into a from-zero Project2Learn course in balanced mode. I am comfortable with JavaScript functions, objects, modules, and npm scripts, but I have never built an HTTP API and do not understand status codes or request concurrency. Treat that as my readiness self-report, ask a micro-diagnostic only if it changes the route, and teach only the missing prerequisites this repository path needs. I want idiomatic English and matching Chinese with one shared progress file. Reconstruct why routing, validation, storage boundaries, and concurrency become necessary.",
       "expected_output": "Synchronized personalized Chinese and English Web API courses that skip redundant JavaScript basics, add only HTTP/concurrency foundation bridges, and expose routing, validation, storage and concurrency pressures without claiming fictional project history.",
       "files": [
         "evals/fixtures/web-api/README.md",
@@ -37,12 +38,12 @@
         "Paired project-evolution.md files and milestones agree on the causal chain: previous value, new problem, introduced change, deferred limit, and next pressure.",
         "Every milestone includes executable or observable acceptance criteria and five hint levels.",
         "Code and document evidence are distinguished from teaching inference.",
-        "progress.json is shared, language-neutral, schema v2, and does not assign a JavaScript-syntax foundation the learner does not need."
+        "progress.json is shared, language-neutral, schema v3, records balanced learning mode, and does not assign a JavaScript-syntax foundation the learner does not need."
       ]
     },
     {
       "id": 3,
-      "prompt": "这个 Go TCP KV 小项目代码不多。我只写过 Go 的变量、函数、struct 和 map，没有接触 net 包、TCP、goroutine、mutex 或协议解析。请把这些作为我的自评基线，不要让我去学完整 Go 课程；只生成项目需要的传递性前置补给，再做中英双语 Project2Learn 课程，让我从最小内存 KV 一步步演化到当前项目。两种语言的能力 ID、补给 ID、阶段 ID、验收命令和源码位置必须一致。",
+      "prompt": "这个 Go TCP KV 小项目代码不多。我只写过 Go 的变量、函数、struct 和 map，没有接触 net 包、TCP、goroutine、mutex 或协议解析。请把这些作为我的自评基线，采用 cs_depth 模式，不要让我去学完整 Go 课程；只生成项目需要的传递性前置补给，再做中英双语 Project2Learn 课程，让我从最小内存 KV 一步步演化到当前项目。两种语言的能力 ID、补给 ID、阶段 ID、验收命令和源码位置必须一致。",
       "expected_output": "A bilingual systems reconstruction course that connects an in-memory KV core to parsing, TCP connection lifecycle, malformed input handling, concurrency and shared-state pressure.",
       "files": [
         "evals/fixtures/infra-loop/README.md",
