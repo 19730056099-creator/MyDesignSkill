@@ -6,7 +6,7 @@
 ## 1. Skill 定位
 
 **Project2Learn**：把一个成熟的本地或 GitHub 代码仓库，转换为一门「从零重建
-（from-zero reconstruction）」的双语（zh-CN / en）项目式课程。
+（from-zero reconstruction）」的双语（zh-CN / en）项目式课程。v4 明确分离密集的课程设计层与轻量的学习者教材层，由学习体验渲染器把因果模型变成“先做→观察→命名→最小解释→用回项目”的短课。
 
 核心思想：**逆向推导教学顺序 + 学习者准备度/模式校准 + Touch→Understand→Own** —— 从成熟能力倒推出项目所需能力、技术/故障地图、传递性前置知识、工程压力和最简劣化设计；再确认学习者真正掌握了什么及其 `product_builder`、`cs_depth` 或 `balanced` 模式，只为缺口生成短小补给，并在每个单元明确首次触摸、AI 边界、亲手关键实践、解释/迁移检查，最后正向排成 5–12 个可运行里程碑。教学序列 ≠ 作者真实开发历史。
 
@@ -25,9 +25,10 @@ project2learn/
 │   ├── repository-analysis.md  # 仓库分析 + 项目所需能力 DAG
 │   ├── learner-readiness.md    # 学习者校准、传递依赖、前置补给、及时门控
 │   ├── reconstruction-method.md# 重建方法论（补给分离 + 倒推正排 + 因果演变链）
-│   ├── output-contract.md      # 输出契约（含双语 project-evolution 与 GETTING_STARTED）
+│   ├── output-contract.md      # schema-v4 设计 JSON、lesson bundle 与状态契约
+│   ├── learning-experience-renderer.md # 课程设计层→学习者教材层
 │   ├── tutor-and-review.md     # 辅导循环、5 级提示阶梯、阶段感知评审、状态机
-│   └── fanout-generation.md    # 大仓库 fan-out v3（硬门控/浅依赖/单写者收尾）
+│   └── fanout-generation.md    # 大仓库 fan-out v4（硬门控/浅依赖/单写者收尾）
 ├── scripts/
 │   ├── init_workspace.py       # 初始化/恢复工作区（--reference --output-root --revision）
 │   ├── validate_course.py      # 课程结构校验器（analyzing 阶段必须通过）
@@ -35,7 +36,7 @@ project2learn/
 ├── assets/templates/           # zh-CN 与 en 成对模板（roadmap/milestone/review 等）
 │   └─ progress.json            # 语言中立的状态模板
 ├── evals/                      # 评测用例 + fixture 小仓库（python-cli/web-api/infra-loop/session）
-├── version/                    # complain-v1/v2：设计目标、旧版痛点与版本改进说明
+├── version/                    # complain-v1…v4：设计目标、旧版痛点与版本改进说明
 └── tests/                      # init/templates/validate/fan-out 契约测试
 ```
 
@@ -45,13 +46,13 @@ project2learn/
 
 | 用户意图 | 模式 | 读什么 |
 |---|---|---|
-| 分析新仓库 / 改变范围 | `new_course` | repository-analysis → learner-readiness → reconstruction-method → output-contract |
+| 分析新仓库 / 改变范围 | `new_course` | repository-analysis → learner-readiness → reconstruction-method → learning-experience-renderer → output-contract |
 | 回答水平问题 / 按零基础制定 | `readiness` | progress.json + learner-readiness + 相关项目知识证据 |
-| 学前置补给单元 | `foundation` | progress.json + 当前补给双语文件 + learner-readiness + tutor-and-review |
+| 学前置补给单元 | `foundation` | progress.json + 当前 design JSON + 当前双语 lesson + learner-readiness + tutor-and-review |
 | 大仓库 / monorepo，且 ≥~20 个相关文件并需要 7–12 个里程碑 | `new_course_fanout` | fanout-generation + 按阶段所需其他 reference；先执行硬门控 |
-| 继续已有工作区 | `resume` | progress.json + 当前里程碑双语文档 + tutor-and-review |
-| 要提示 | `hint` | progress.json + 当前里程碑 + tutor-and-review 的提示章节 |
-| 提交实现评审 | `review` | progress.json + 当前里程碑 + 验收证据 + tutor-and-review + output-contract |
+| 继续已有工作区 | `resume` | progress.json + 当前 design JSON/双语 lesson（旧 schema 读单文件）+ tutor-and-review |
+| 要提示 | `hint` | progress.json + 当前 design/lesson + tutor-and-review 的提示章节 |
+| 提交实现评审 | `review` | progress.json + 当前 design/lesson + 验收证据 + tutor-and-review + output-contract |
 | 问进度 | `status` | 只读 progress.json |
 | 问成熟项目为何这样设计 | `why` | 相关证据位置 + reconstruction-method；区分证据与推断 |
 
@@ -61,19 +62,20 @@ project2learn/
    `<learning-root>/project2learn/<repository>/` 工作区。
 2. **中英严格同步**：同一 `artifact_id`、文件名、里程碑编号、命令、验收含义、
    评审结论必须一致。先建语言中立的分析模型，再分别渲染两语，禁止由一语翻译出另一语。
-3. **证据标注纪律**：
+3. **双层输出纪律**：因果链、能力、证据、精确 AI 边界、验收和提示写入 `course/design/`；学习者只读短 lesson，不得把课程模型字段直接渲染成教材标题。
+4. **证据标注纪律**：
    - `code_evidence`（代码证据）/ `document_evidence`（README 等文档声明，
      不等于已验证行为）/ `teaching_inference`（教学推断，必须带 `confidence`
      和 `rationale`）。
    - 测试证明期望行为而非所有实现路径；commit 历史支持时间线但不定义最佳教学顺序；
      必须说明未检查/无法运行/不确定的部分。
-4. **渐进揭示**：默认从最低有用提示开始；学习者明确索要更深提示或参考实现时照办。
-5. **阶段感知评审**：早期简单设计只要满足当前单元即可通过，不因缺少后期机制而挂科；但绕过学习约束的取巧代码即使输出正确也不给过。
-6. **不得假设水平**：项目知识图谱不等于学习者已掌握。最终个性化路线前必须让用户选择按零基础、短校准或显式豁免；学习者证据与仓库证据分开记录。
-7. **只补项目所需子集**：递归展开前置依赖，但只生成当前路线需要的 10–30 分钟补给单元；补给不计入 5–12 个项目里程碑。
-8. **先触摸再理解**：先给场景、最小操作和可观察结果，再解释原理；重要能力按 touched→explained→debugged→transferred 螺旋复现。
-9. **AI 降成本、不替代学习**：每个单元声明 AI 可生成内容、学习者必须亲手完成的关键动作/代码及必须解释的机制；工作代码本身不等于掌握。
-10. **先建地图**：`project-map.md` 必须提供技术层级和最小故障定位路径，让学习者知道代码、命令、进程、网络和存储分别在哪一层。
+5. **渐进揭示**：默认从最低有用提示开始；学习者明确索要更深提示或参考实现时照办。
+6. **阶段感知评审**：早期简单设计只要满足当前单元即可通过，不因缺少后期机制而挂科；但绕过学习约束的取巧代码即使输出正确也不给过。
+7. **不得假设水平**：项目知识图谱不等于学习者已掌握。最终个性化路线前必须让用户选择按零基础、短校准或显式豁免；学习者证据与仓库证据分开记录。
+8. **只补项目所需子集**：递归展开前置依赖，但只生成当前路线需要的 10–30 分钟补给单元；补给不计入 5–12 个项目里程碑。
+9. **先触摸再理解**：先给场景、最小操作和可观察结果，再解释原理；重要能力按 touched→explained→debugged→transferred 螺旋复现。
+10. **AI 降成本、不替代学习**：每个单元声明 AI 可生成内容、学习者必须亲手完成的关键动作/代码及必须解释的机制；工作代码本身不等于掌握。
+11. **先建地图**：`project-map.md` 必须提供技术层级和最小故障定位路径，让学习者知道代码、命令、进程、网络和存储分别在哪一层。
 
 ## 5. 新课程工作流（线性模式）
 
@@ -84,14 +86,14 @@ project2learn/
 5. 形成语言中立仓库模型与项目所需能力 DAG：稳定 competency ID、类别、传递依赖、阻塞性、required_by、微诊断和证据。
 6. 复用用户已说明的水平，让用户选择 `assume_beginner`、3–7 个项目相关的短校准，或显式豁免并记录风险；同时按目标选择 `product_builder`、`cs_depth` 或 `balanced`。等待必要答案时保持 analyzing、current_milestone 0。
 7. 计算个人缺口，按拓扑生成 0–8 个短前置补给；只前置里程碑 1 所需内容，后续依赖及时补。
-8. 按 reconstruction-method.md 建立语言中立的演变模型，重建 5–12 个因果相连的项目里程碑；补给单元不占里程碑数量。
-9. 按 output-contract.md 渲染双语 project-map / architecture / knowledge-graph / readiness / project-evolution / roadmap、foundation 与 milestone，以及 `GETTING_STARTED.md`。
-10. 填充 schema-v3 learner_profile（含 learning_mode 和 practice_depth）、practice_evidence、foundation、milestone 与 current_unit，保持 analyzing。
+8. 按 reconstruction-method.md 建立语言中立的演变与 lesson 模型，重建 5–12 个因果相连的项目里程碑；补给单元不占里程碑数量。
+9. 按 learning-experience-renderer.md 与 output-contract.md：密集设计写入 `course/design/`；每个 foundation 渲染 1–3 课、milestone 渲染 2–5 课，一课一个认知目标；核心分析文档仅作可选参考；生成 `GETTING_STARTED.md` 直达当前课。
+10. 填充 schema-v4 learner_profile、practice_evidence、foundation、milestone、current_unit 与 current_lesson，保持 analyzing。
 11. 运行 `validate_course.py`，修复错误直至通过。
-12. 通过后置 ready：若里程碑 1 有缺口，current_unit 指向第一个 foundation 且 current_milestone 0；否则指向 milestone-01 且 current_milestone 1。再跑完整校验。
+12. 通过后置 ready：若里程碑 1 有缺口，current_unit 指向第一个 foundation、current_lesson 指向首课且 current_milestone 0；否则指向 milestone-01 的首课且 current_milestone 1。再跑完整校验。
 13. 汇报范围、校准决策、补给/里程碑数、不确定项、双语 readiness/roadmap 路径和第一个动作。
 
-### Fan-out v3（仅大仓库）
+### Fan-out v4（仅大仓库）
 
 **硬门控**：先排除 dependency/vendor/generated/cache/binary/大数据资产，再计数。
 只有“≥~20 个相关文件”且“教学路线需要 7–12 个里程碑”时才默认 fan-out；任一条件
@@ -105,14 +107,14 @@ project2learn/
 3. Render：把 project-map / architecture / knowledge-graph / readiness / project-evolution / roadmap 及所有 unit-def 合并给一个双语 writer；演变文档与 milestone-def 共用同一因果链。
 4. Foundations：0–6 个补给只依赖 Render 和自己的 foundation-def；文件可并行生成，学习顺序由 DAG 和 progress 控制。
 5. Milestones：7–12 个项目里程碑只依赖 Render 和自己的 milestone-def，不得彼此串联，必须一波并行。
-6. Finalize：唯一共享状态写者；生成双语 `GETTING_STARTED.md`、聚合 schema-v3 状态、选择第一个 foundation 或 milestone 并完整校验。
+6. Finalize：唯一共享状态写者；生成双语 `GETTING_STARTED.md`、聚合 schema-v4 状态、选择第一个 foundation 或 milestone 并完整校验。
 
 执行者只接收 ≤500 词 brief、自己的任务切片、声明输入和上游 handoff；用
 `validate_course.py <workspace> --partial --only <声明输出>...` 隔离自验，避免并行发布时
 看到其他单元尚未成对写完的临时状态。通过的 milestone 默认不派 reviewer；
 只审 partial 失败项和唯一的合并 Render，失败最多重做一次。执行者不得改
 `progress.json`，只能写独立的 `orchestration/unit-status/<ID>.json`，避免并行覆盖；
-Finalize 再单写聚合。核心文件建议每语 500–900 词，补给每语 400–800 词，里程碑每语 700–1200 词，
+Finalize 再单写聚合。可选参考文件建议每语 500–900 词，每节学习者 lesson 建议每语 250–600 词，
 防止独立 agent 过度展开。传入 `fastModel` 给 gate/execute/review，`strongModel` 给
 plan/finalize；未提供时会退回运行时默认模型，速度不作保证。
 
@@ -122,7 +124,7 @@ plan/finalize；未提供时会退回运行时默认模型，速度不作保证�
 ## 6. 交互工作流（resume/hint/review/status/why）
 
 1. 先读 `progress.json`（双语言共享的唯一状态源）。若参考仓库 revision 变化：保留旧版本、转回 `analyzing`、重新做仓库分析后再辅导。
-2. schema v2/v3 按 `current_unit` 读取双语文件；schema v1/v2 不重置，在下一个未开始单元前渐进补齐 v3 学习模式与实践字段，不伪造历史证据。
+2. schema v4 按 `current_unit + current_lesson` 读取设计 JSON 和当前双语课；schema v2/v3 继续读取单文件单元；旧工作区不强制迁移、不重置、不伪造历史证据。
 3. 项目里程碑开始前只检查其 blocking + required_by 能力；unknown/needs_refresh 先微诊断或补给，waived 必须有风险记录。
 4. 辅导循环：brief → 学习者尝试 → 观察证据 → 定向提问/提示 → 修改 → 评审 → 下一个可用单元。
    一次只问一个有用的问题；学习者已懂就前进，不重复苏格拉底式追问。
@@ -140,14 +142,14 @@ plan/finalize；未提供时会退回运行时默认模型，速度不作保证�
 
 ## 7. 完成门槛
 
-- 课程 `ready` = 双语树通过校验 + readiness 决策 + project-evolution 成对且与里程碑因果一致 + 0–8 对补给 + 5–12 对项目里程碑；不代表未来所有前置能力已掌握。
-- Foundation `passed` = 退出能力有可观察证据；schema v3 还要记录亲手动作、结果、解释、AI 使用和 practice_depth，再把相关 competency 置为 ready/demonstrated。
+- 课程 `ready` = 双语 lesson 树通过校验 + readiness 决策 + 设计 JSON/可选参考成对一致 + 0–8 个补给 bundle + 5–12 个项目里程碑 bundle；不代表未来所有前置能力已掌握。
+- Foundation `passed` = 退出能力有可观察证据；schema v3+ 还要记录亲手动作、结果、解释、AI 使用和 practice_depth，再把相关 competency 置为 ready/demonstrated。
 - 里程碑开始 = 其 blocking competency 已 ready 或显式 waived 并记录风险。
-- 里程碑 `passed` = 有具体验收证据；schema v3 不能只凭 AI 生成代码运行成功，必须有匹配的 practice_evidence。
+- 里程碑 `passed` = 有具体验收证据；schema v3+ 不能只凭 AI 生成代码运行成功，必须有匹配的 practice_evidence。
 - 课程 `complete` = 所有里程碑 passed 或 skipped_with_risk + 双语仍对齐 +
   最终评审说明学习旅程如何衔接回成熟仓库。
 
 ## 8. 每次交互收尾必含
 
-当前 readiness/foundation/milestone 单元与状态、学习者的下一个具体动作及验证方式、相关的中文和英文文件路径。
+当前 readiness/foundation/milestone 单元、current lesson 与状态、学习者的下一个具体动作及验证方式、相关的中文和英文 lesson 路径。
 首次进入工作区时，先指向 `course/GETTING_STARTED.md`（若仍是占位符立即替换为课程专属指南）。

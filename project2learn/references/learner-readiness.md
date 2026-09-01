@@ -102,7 +102,7 @@ A foundation unit passes only with its exit evidence. After it passes, mark its 
 
 ## 7. Existing workspace migration
 
-Do not invalidate or restart a schema-v1/v2 course merely because it lacks the v3 learning-mode or practice fields. Preserve its current milestone, hints, evidence, and reviews. Before the next not-yet-started unit, choose a learning mode, initialize practice depths without inventing mastery, add the required v3 sections only to future units, validate, then continue.
+Do not invalidate or restart a schema-v1/v2/v3 course merely because it lacks newer learning-mode, practice, or lesson-bundle fields. Preserve its current milestone, hints, evidence, and reviews. Before the next not-yet-started unit, add only the missing fields required by that workspace without inventing mastery. Migrate a v3 single-file route to schema-v4 lesson bundles only when the learner requests regeneration or the repository scope/revision changes.
 
 If the learner is already in the middle of a milestone, do not interrupt with a broad assessment. Check only a concrete prerequisite that is visibly blocking progress.
 

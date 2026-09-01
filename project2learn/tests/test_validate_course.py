@@ -12,6 +12,7 @@ from scripts.validate_course import (
     LEGACY_MILESTONE_HEADINGS,
     V3_CORE_HEADINGS,
     V3_MILESTONE_HEADINGS,
+    V4_LESSON_HEADINGS,
     validate_selected_files,
     validate_workspace,
 )
@@ -70,6 +71,94 @@ def render_artifact(artifact_id: str, language: str, headings: list[str]) -> str
         "rationale: The ordering exposes one engineering pressure at a time.",
     ])
     return "\n\n".join(body) + "\n"
+
+
+def render_lesson(unit_id: str, lesson_number: int, language: str) -> str:
+    lesson_id = f"lesson-{lesson_number:02d}"
+    body = [
+        "---",
+        f"artifact_id: {unit_id}-{lesson_id}",
+        f"language: {language}",
+        f"unit_id: {unit_id}",
+        f"lesson_id: {lesson_id}",
+        "---",
+        f"# {'第' if language == 'zh-CN' else 'Lesson'} {lesson_number}",
+    ]
+    for heading in V4_LESSON_HEADINGS[language]:
+        body.extend([heading, "Do one small thing and observe the result."])
+    return "\n\n".join(body) + "\n"
+
+
+def render_design(number: int) -> dict:
+    unit_id = f"milestone-{number:02d}"
+    return {
+        "schema_version": 1,
+        "artifact_id": f"{unit_id}-design",
+        "unit_id": unit_id,
+        "kind": "milestone",
+        "number": number,
+        "slug": "stage",
+        "causal_stage": {
+            "current_version": "A runnable previous version.",
+            "previous_value": "It already produces one result.",
+            "new_problem": "A visible limitation now appears.",
+            "introduced_change": "Add the smallest mechanism that addresses it.",
+            "resolved_pressure": "The visible limitation is removed.",
+            "deferred_limit": "A later limit remains deliberate.",
+            "next_pressure": "The next user action exposes another problem.",
+        },
+        "competencies": [],
+        "prerequisite_foundations": [],
+        "practice_design": {
+            "ai_allowed": ["scaffolding"],
+            "learner_owned": ["critical action"],
+            "must_explain": ["observed behavior"],
+            "transfer_checks": ["change one input"],
+        },
+        "acceptance": [{"id": f"m{number:02d}-a01", "result": "observable"}],
+        "hints": [{"level": level, "content": "hint"} for level in range(1, 6)],
+        "source_bridge": ["fixture.py::symbol"],
+        "evidence": [{
+            "type": "teaching_inference",
+            "source": "fixture.py::symbol",
+            "confidence": "medium",
+            "rationale": "The sequence exposes one pressure at a time.",
+        }],
+        "lessons": [
+            {
+                "id": f"lesson-{lesson:02d}",
+                "artifact_id": f"{unit_id}-lesson-{lesson:02d}",
+                "cognitive_goal": "Notice and resolve one friction.",
+                "situation": "Run the current version.",
+                "friction": "One behavior is inconvenient.",
+                "action": "Make one small change.",
+                "observable_result": "The behavior changes visibly.",
+                "concept_name": "One useful concept.",
+                "minimum_theory": "Only enough explanation for this change.",
+                "project_delta": "The project can now do one more thing.",
+                "next_problem": "A new natural limitation appears.",
+                "deferred": None,
+            }
+            for lesson in range(1, 3)
+        ],
+    }
+
+
+def render_foundation_design(number: int) -> dict:
+    design = render_design(number)
+    unit_id = f"foundation-{number:02d}"
+    design.update({
+        "artifact_id": f"{unit_id}-design",
+        "unit_id": unit_id,
+        "kind": "foundation",
+        "slug": "basics",
+        "why_now": "This capability blocks the first project action.",
+        "acceptance": [{"id": f"f{number:02d}-a01", "result": "observable"}],
+    })
+    design.pop("causal_stage")
+    design["lessons"] = design["lessons"][:1]
+    design["lessons"][0]["artifact_id"] = f"{unit_id}-lesson-01"
+    return design
 
 
 def write_review_pair(
@@ -244,6 +333,33 @@ Open the current unit.
         )
         return progress
 
+    def upgrade_to_schema4(self) -> dict:
+        progress = self.upgrade_to_schema3()
+        progress["schema_version"] = 4
+        progress["current_lesson"] = {"unit_id": "milestone-01", "id": "lesson-01"}
+        design_root = self.workspace / "course" / "design"
+        (design_root / "foundations").mkdir(parents=True)
+        (design_root / "milestones").mkdir(parents=True)
+        for number in range(1, 6):
+            stem = f"{number:02d}-stage"
+            for language in ("zh-CN", "en"):
+                (self.workspace / "course" / language / "milestones" / f"{stem}.md").unlink()
+            (design_root / "milestones" / f"{stem}.json").write_text(
+                json.dumps(render_design(number), ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+            for language in ("zh-CN", "en"):
+                lesson_root = self.workspace / "course" / language / "milestones" / stem
+                lesson_root.mkdir()
+                for lesson in range(1, 3):
+                    (lesson_root / f"{lesson:02d}.md").write_text(
+                        render_lesson(f"milestone-{number:02d}", lesson, language),
+                        encoding="utf-8",
+                    )
+        (self.workspace / "progress.json").write_text(
+            json.dumps(progress, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        return progress
+
     def tearDown(self) -> None:
         self.temporary.cleanup()
 
@@ -273,6 +389,84 @@ Open the current unit.
         self.upgrade_to_schema3()
 
         self.assertEqual(validate_workspace(self.workspace), [])
+
+    def test_valid_schema4_course_has_lightweight_lesson_bundles(self) -> None:
+        self.upgrade_to_schema4()
+
+        self.assertEqual(validate_workspace(self.workspace), [])
+
+    def test_schema4_accepts_foundation_lesson_bundle_as_current_unit(self) -> None:
+        progress = self.upgrade_to_schema4()
+        design = render_foundation_design(1)
+        design_path = self.workspace / "course" / "design" / "foundations" / "F01-basics.json"
+        design_path.write_text(json.dumps(design, ensure_ascii=False, indent=2), encoding="utf-8")
+        for language in ("zh-CN", "en"):
+            lesson_root = self.workspace / "course" / language / "foundations" / "F01-basics"
+            lesson_root.mkdir()
+            (lesson_root / "01.md").write_text(
+                render_lesson("foundation-01", 1, language), encoding="utf-8"
+            )
+            readiness = self.workspace / "course" / language / "readiness.md"
+            readiness.write_text(
+                readiness.read_text(encoding="utf-8")
+                + "competency_id: language.python.functions\nstate: learning\nfoundation_id: foundation-01\n",
+                encoding="utf-8",
+            )
+        progress["learning_phase"] = "foundations"
+        progress["current_unit"] = {"kind": "foundation", "id": "foundation-01"}
+        progress["current_lesson"] = {"unit_id": "foundation-01", "id": "lesson-01"}
+        progress["current_milestone"] = 0
+        progress["learner_profile"]["competencies"] = [{
+            "id": "language.python.functions",
+            "category": "language",
+            "state": "learning",
+            "evidence_level": "none",
+            "practice_depth": "unseen",
+            "prerequisites": [],
+            "required_by": ["milestone-01"],
+            "blocking": True,
+            "evidence": [],
+        }]
+        progress["foundation_units"] = [{
+            "id": "foundation-01",
+            "number": 1,
+            "status": "ready",
+            "competencies": ["language.python.functions"],
+            "required_by": ["milestone-01"],
+            "acceptance": ["f01-a01"],
+            "risk_notes": [],
+        }]
+        (self.workspace / "progress.json").write_text(json.dumps(progress), encoding="utf-8")
+
+        self.assertEqual(validate_workspace(self.workspace), [])
+
+    def test_schema4_rejects_design_metadata_leaking_into_lesson(self) -> None:
+        self.upgrade_to_schema4()
+        lesson = self.workspace / "course" / "en" / "milestones" / "01-stage" / "01.md"
+        lesson.write_text(lesson.read_text(encoding="utf-8") + "\n## Evidence Ledger\nHidden data.\n", encoding="utf-8")
+
+        errors = validate_workspace(self.workspace)
+
+        self.assertTrue(any("exposes design-layer heading" in error for error in errors))
+
+    def test_schema4_current_lesson_must_exist_in_design(self) -> None:
+        progress = self.upgrade_to_schema4()
+        progress["current_lesson"]["id"] = "lesson-99"
+        (self.workspace / "progress.json").write_text(json.dumps(progress), encoding="utf-8")
+
+        self.assertIn("current_lesson references unknown lesson", validate_workspace(self.workspace))
+
+    def test_schema4_selected_validation_requires_complete_lesson_bundle(self) -> None:
+        self.upgrade_to_schema4()
+        selected = [
+            "course/design/milestones/01-stage.json",
+            "course/zh-CN/milestones/01-stage/01.md",
+            "course/en/milestones/01-stage/01.md",
+        ]
+
+        errors = validate_selected_files(self.workspace, selected)
+
+        self.assertTrue(any("must declare lessons" in error for error in errors))
 
     def test_schema3_requires_learning_mode_decision(self) -> None:
         progress = self.upgrade_to_schema3()

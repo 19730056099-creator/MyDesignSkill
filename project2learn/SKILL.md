@@ -18,7 +18,8 @@ Reconstruct the learning journey behind a mature repository and personalize the 
 - Teach only the transitive prerequisite subset needed by the selected project path. Use short foundation units rather than redirecting the learner to generic full courses.
 - Reveal answers gradually. Start with the lowest useful hint, but honor an explicit request for a deeper hint or reference implementation.
 - Review the learner against the current foundation or milestone. A simple early design may pass even when the mature project later replaces it.
-- Explain every milestone as a causal evolution: previous value → new problem → introduced change → resolved pressure → deferred limit → next pressure. Keep this teaching reconstruction distinct from verified project history.
+- Model every milestone as a causal evolution: previous value → new problem → introduced change → resolved pressure → deferred limit → next pressure. Keep this teaching reconstruction distinct from verified project history.
+- Separate the dense curriculum-design layer from learner-facing lessons. Keep causal fields, competencies, evidence, exact AI boundaries, hints, and acceptance in `course/design/`; let learners experience that causality through small actions and results instead of reading the model.
 - Use `touch → understand → own`: first create a small observable encounter, then explain the mechanism, then require the learner to perform, explain, debug, or transfer the critical part.
 - Build a minimal technology-layer and troubleshooting map before deep detail so the learner can place generated code, commands, data, and failures in the system.
 - Declare an AI boundary for every new foundation and milestone. AI may reduce mechanical implementation cost, but it must not replace the learner's required manual action, explanation, or acceptance evidence.
@@ -30,13 +31,13 @@ Determine the session mode before loading detailed guidance:
 
 | User intent | Mode | Read |
 |---|---|---|
-| Analyze a new repository or change scope | `new_course` | `references/repository-analysis.md`, `references/learner-readiness.md`, then `references/reconstruction-method.md` and `references/output-contract.md` |
+| Analyze a new repository or change scope | `new_course` | `references/repository-analysis.md`, `references/learner-readiness.md`, `references/reconstruction-method.md`, `references/learning-experience-renderer.md`, then `references/output-contract.md` |
 | Answer readiness questions, request a beginner route, or calibrate prerequisites | `readiness` | `progress.json`, `references/learner-readiness.md`, relevant repository knowledge evidence, then paired `readiness.md` when present |
-| Study or request help with a foundation unit | `foundation` | `progress.json`, current foundation pair, `references/learner-readiness.md`, then the relevant hint guidance in `references/tutor-and-review.md` |
+| Study or request help with a foundation unit | `foundation` | `progress.json`, current design JSON and lesson pair (or legacy unit pair), `references/learner-readiness.md`, then `references/tutor-and-review.md` |
 | Analyze an oversized repository / monorepo, or a prior single-context run degraded | `new_course_fanout` | `references/fanout-generation.md`, plus the references above as needed per phase; collect a learner profile before full dispatch |
-| Continue an existing workspace | `resume` | `progress.json`, current unit pair, `references/learner-readiness.md` when readiness/foundation work is active, then `references/tutor-and-review.md` |
-| Ask for a hint | `hint` | `progress.json`, current unit pair, then the hint section of `references/tutor-and-review.md` |
-| Submit an implementation for review | `review` | `progress.json`, current unit pair, acceptance evidence, `references/tutor-and-review.md`, and `references/output-contract.md` |
+| Continue an existing workspace | `resume` | `progress.json`, current design/lesson pair or legacy unit pair, `references/learner-readiness.md` when readiness/foundation work is active, then `references/tutor-and-review.md` |
+| Ask for a hint | `hint` | `progress.json`, current design/lesson pair or legacy unit pair, then the hint section of `references/tutor-and-review.md` |
+| Submit an implementation for review | `review` | `progress.json`, current design/lesson pair or legacy unit pair, acceptance evidence, `references/tutor-and-review.md`, and `references/output-contract.md` |
 | Ask for progress or status | `status` | `progress.json` only; load other files only when needed to explain the next action |
 | Ask why the mature project uses a design | `why` | Relevant evidence locations and `references/reconstruction-method.md`; distinguish evidence from inference |
 
@@ -64,9 +65,9 @@ Ordinary code explanation, bug fixing, feature implementation, generic code revi
    - Ask only project-relevant, capability-based questions. Do not issue a generic technology survey.
    - Keep `course_status: analyzing`, `learning_phase: assessing`, and `current_milestone: 0` while awaiting required answers.
 7. Compute the learner-specific prerequisite gap and topological foundation route. Create only units that close required gaps; front-load only those needed for milestone 1 and attach later units just in time.
-8. Read `references/reconstruction-method.md`. Build a language-neutral evolution model and reconstruct 5–12 causally connected project milestones driven by prerequisites and engineering pressure, not directory order or commit chronology. Give each unit a first-touch action, AI boundary, manual critical practice, explanation/transfer check, and later recurrence where useful. Foundation units do not count toward the 5–12 milestone range.
-9. Read `references/output-contract.md`. Render matching `project-map.md`, `architecture.md`, `knowledge-graph.md`, `readiness.md`, `project-evolution.md`, and `roadmap.md` files, plus paired foundation and milestone files and the mandatory bilingual `course/GETTING_STARTED.md`. The project map must include technology layers and a minimal failure-location path.
-10. Populate schema-v3 language-neutral competency, practice-evidence, foundation, milestone, and current-unit records while keeping `course_status: analyzing`.
+8. Read `references/reconstruction-method.md`. Build a language-neutral evolution model and reconstruct 5–12 causally connected project milestones driven by prerequisites and engineering pressure, not directory order or commit chronology. Give each unit a first-touch action, AI boundary, manual critical practice, explanation/transfer check, recurrence, and lesson design. Foundation units do not count toward the 5–12 milestone range.
+9. Read `references/learning-experience-renderer.md`, then `references/output-contract.md`. Write dense language-neutral unit designs under `course/design/`. Render each foundation as 1–3 and each milestone as 2–5 paired learner lessons, one cognitive goal per lesson: action → observation/friction → concept name → minimum theory → project application → project growth → next problem. Keep `project-map.md`, `architecture.md`, `knowledge-graph.md`, `project-evolution.md`, and `roadmap.md` as optional reference views, not the main reading path. Render the mandatory bilingual `course/GETTING_STARTED.md` to open the actual current lesson.
+10. Populate schema-v4 language-neutral competency, practice-evidence, foundation, milestone, current-unit, and current-lesson records while keeping `course_status: analyzing`.
 11. Validate the staged course:
 
     ```text
@@ -75,27 +76,27 @@ Ordinary code explanation, bug fixing, feature implementation, generic code revi
 
     Fix validation errors while the course remains `analyzing`.
 12. After validation:
-    - If milestone 1 has unmet prerequisites, set `course_status: ready`, `learning_phase: foundations`, `current_unit` to the first topologically available foundation, and `current_milestone: 0`.
-    - Otherwise set `course_status: ready`, `learning_phase: milestones`, `current_unit` to milestone 1, and `current_milestone: 1`.
+    - If milestone 1 has unmet prerequisites, set `course_status: ready`, `learning_phase: foundations`, `current_unit` to the first topologically available foundation, `current_lesson` to its first lesson, and `current_milestone: 0`.
+    - Otherwise set `course_status: ready`, `learning_phase: milestones`, `current_unit` to milestone 1, `current_lesson` to its first lesson, and `current_milestone: 1`.
     Run the validator again. If final validation fails, restore `analyzing` and fix the errors.
 13. Report the selected scope, assessment decision, personalized gaps, foundation count, milestone count, important uncertainties, both localized roadmap/readiness paths, and the first concrete action. Keep long course content in files rather than dumping it into chat.
 
 ## Fan-out generation (large repositories)
 
-Use fan-out only when the repository has at least about 20 relevant files **and** the justified route has 7–12 milestones, unless the user explicitly requests a diagnostic override. Collect or explicitly waive a learner profile before full generation. A direct workflow invocation without one returns `assessment_required` instead of manufacturing a fixed route. The v3 workflow uses one planner for the repository, competency, and evolution models, consolidates paired core rendering (including `project-evolution.md`), and runs bounded foundation and milestone units in a shallow parallel wave. Executors use isolated validation, write unique unit-status files, and never edit shared `progress.json`; one finalizer selects the first foundation or milestone and runs full validation. Full contract: `references/fanout-generation.md`. Script: `scripts/fanout_course.workflow.js`.
+Use fan-out only when the repository has at least about 20 relevant files **and** the justified route has 7–12 milestones, unless the user explicitly requests a diagnostic override. Collect or explicitly waive a learner profile before full generation. A direct workflow invocation without one returns `assessment_required` instead of manufacturing a fixed route. The v4 workflow uses one planner for the repository, competency, evolution, and lesson models, consolidates optional paired reference rendering, and runs bounded foundation and milestone lesson-bundle units in a shallow parallel wave. Executors use isolated validation, write unique unit-status files, and never edit shared `progress.json`; one finalizer selects the first foundation or milestone and runs full validation. Full contract: `references/fanout-generation.md`. Script: `scripts/fanout_course.workflow.js`.
 
 ## Interactive workflow
 
 1. Read `progress.json` first. It is the shared state source for both languages. Resolve the current reference revision; if it differs from the stored non-empty revision, retain the previous revision, transition to `analyzing`, and re-run repository analysis before tutoring resumes.
-2. For schema v2 or v3, follow `current_unit`:
+2. For schema v4, follow `current_unit` and `current_lesson`: read the shared unit design plus only the paired current lesson files. For schema v2/v3, keep following the paired single-file current unit.
    - `assessment`: read readiness context and finish only the unresolved calibration;
-   - `foundation`: read both localized foundation files and verify IDs/exit criteria;
-   - `milestone`: read both localized milestone files and verify IDs/acceptance meaning.
-3. Preserve schema-v1/v2 workspaces. Before the next not-yet-started unit, migrate only the fields required by v3 without resetting milestones, reviews, hints, or learner evidence.
+   - `foundation`: verify the unit/lesson IDs and exit criteria;
+   - `milestone`: verify the unit/lesson IDs and acceptance meaning.
+3. Preserve schema-v1/v2/v3 workspaces. Do not force a structural migration during active work; generate lesson bundles only for a regenerated/new v4 route.
 4. Before any milestone begins, gate only the blocking competencies required by that milestone. Offer a diagnostic or foundation unit for unresolved gaps. Honor an explicit waiver and record its risks.
 5. Follow `references/tutor-and-review.md` for tutoring, hints, reviews, skips, and state transitions. Load `references/output-contract.md` before creating or updating review artifacts.
 6. Update paired localized artifacts together. Update `progress.json` once, using language-neutral values. Run the validator after changing course structure, foundation/milestone IDs, learner readiness gates, or completion state.
-7. End each turn with the current unit and status, the learner's next concrete action and verification method, and the relevant Chinese and English paths. On first entry, point to `course/GETTING_STARTED.md`; replace the init placeholder before calling the course ready.
+7. End each turn with the current unit, current lesson, and status, the learner's next concrete action and verification method, and the relevant Chinese and English lesson paths. On first entry, point to `course/GETTING_STARTED.md`; replace the init placeholder before calling the course ready.
 
 ## Evidence discipline
 
@@ -109,4 +110,4 @@ Use fan-out only when the repository has at least about 20 relevant files **and*
 
 ## Completion gates
 
-A schema-v3 course is `ready` only when both language trees validate, include the paired project-evolution artifact, technology/troubleshooting maps, unit AI boundaries, 5–12 paired milestones, and readiness plus learning-mode decisions. “Ready” means the personalized learning path is ready; it does not imply every future prerequisite is already mastered. A foundation unit passes only with exit evidence and, in schema v3, matching direct practice evidence. A project milestone may start only when its blocking competencies are ready or explicitly waived with risk. A schema-v3 milestone passes only with behavioral acceptance plus the learner's manual action, observable result, explanation, AI-usage record, and achieved practice depth. The course is `complete` only when all milestones are passed or explicitly skipped with risk, both language trees remain aligned, and the final review connects the learner's journey back to the mature repository.
+A schema-v4 course is `ready` only when both language lesson trees validate, every unit has a valid design JSON, optional reference views remain bilingual, there are 5–12 milestone bundles, `current_lesson` resolves, and readiness plus learning-mode decisions are complete. “Ready” means the personalized learning path is ready; it does not imply every future prerequisite is already mastered. A foundation unit passes only with exit evidence and, in schema v3+, matching direct practice evidence. A project milestone may start only when its blocking competencies are ready or explicitly waived with risk. A schema-v4 milestone passes only with behavioral acceptance plus the learner's manual action, observable result, explanation, AI-usage record, and achieved practice depth. The course is `complete` only when all milestones are passed or explicitly skipped with risk, both language trees remain aligned, and the final review connects the learner's journey back to the mature repository.

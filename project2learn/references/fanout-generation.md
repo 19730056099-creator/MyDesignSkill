@@ -20,14 +20,14 @@ caches, binaries, and large data assets.
 The reusable workflow performs a second cheap preflight so a direct invocation
 cannot accidentally dispatch a large agent fleet for a small repository.
 
-## v3 topology
+## v4 topology
 
 ```text
 Gate        sizing plus readiness/learning-mode gate; missing choice returns assessment_required
 Plan        one strong planner writes repository, technology, troubleshooting, competency, practice, learner-gap, and route models
-Render      one consolidated executor writes paired schema-v3 core artifacts + unit definitions
-Foundations 0–6 just-enough prerequisite pairs, independent after Render
-Milestones  7–12 project milestone pairs, independent after Render
+Render      one consolidated executor writes paired optional-reference artifacts + unit definitions
+Foundations 0–6 design JSON + 1–3 paired learner lessons, independent after Render
+Milestones  7–12 design JSON + 2–5 paired learner lessons, independent after Render
 Finalize    one strong writer creates GETTING_STARTED, aggregates state, validates
 ```
 
@@ -43,7 +43,7 @@ The planner writes under `<workspace>/orchestration/`:
 3. `plan.json` — machine-readable render and milestone tasks.
 4. `foundation-defs/<FOUNDATION-ID>.json` paths for 0–6 learner-specific prerequisite bridges. Each definition contains competency IDs, dependencies, affected milestone IDs, exit checks, scope exclusions, first touch, manual action, AI allowance, explanation, transfer check, and recurrence.
 5. `milestone-defs/<MILESTONE-ID>.json` paths for 7–12 project milestones. Each definition contains title, goal, pressure, competency IDs, acceptance IDs, source/API locations, and the same `touch → understand → own` practice fields.
-6. Initial schema-v3 `progress.json.orchestration` state, preserving the supplied learner profile and learning mode while initializing practice depth honestly.
+6. Initial schema-v4 `progress.json.orchestration` state, preserving the supplied learner profile and learning mode while initializing practice depth honestly.
 
 It also writes the language-neutral repository model to:
 
@@ -61,8 +61,11 @@ A plan unit has this shape:
   "depends_on": [],
   "inputs": ["orchestration/milestone-defs/milestone-03.json"],
   "outputs": [
-    "course/zh-CN/milestones/03-example.md",
-    "course/en/milestones/03-example.md"
+    "course/design/milestones/03-example.json",
+    "course/zh-CN/milestones/03-example/01.md",
+    "course/en/milestones/03-example/01.md",
+    "course/zh-CN/milestones/03-example/02.md",
+    "course/en/milestones/03-example/02.md"
   ],
   "acceptance": ["matching IDs, commands, evidence, and acceptance meaning"],
   "languages": ["zh-CN", "en"]
@@ -90,7 +93,7 @@ Files remain the cross-agent memory, but context should be bounded.
 Executor sequence:
 
 1. Read declared inputs and only the source files needed for evidence.
-2. Write declared outputs with first-touch, AI-boundary, learner-owned practice, explanation, and transfer sections.
+2. Write the declared language-neutral design JSON, then render paired short lessons through `learning-experience-renderer.md`. Keep exact AI responsibility, evidence, acceptance, and hints in design data; express AI guidance naturally in learner prose.
 3. Run partial validation:
 
    ```text
@@ -118,8 +121,8 @@ Cold-started agents tend to overproduce. Unless repository complexity clearly
 requires more, use these targets:
 
 - each localized core artifact, including project evolution: roughly 500–900 words;
-- each localized foundation: roughly 400–800 words;
-- each localized milestone: roughly 700–1200 words;
+- each localized learner lesson: roughly 250–600 words;
+- each foundation: 1–3 lessons; each milestone: 2–5 lessons;
 - handoff note: at most 200 words.
 
 Do not copy mature source implementations, repeat the same evidence explanation
@@ -145,10 +148,10 @@ dependency.
 One finalizer:
 
 1. Reads artifacts, unit-status files, conventions, and failure ledger.
-2. Creates the course-specific bilingual `course/GETTING_STARTED.md`, pointing to readiness, the technology/troubleshooting map, project evolution, and the actual first unit.
-3. Aggregates the schema-v3 learner profile, learning mode, competency practice depths, empty initial practice evidence, foundation/milestone statuses, attempts, handoffs, and risks without deleting history.
+2. Creates the course-specific bilingual `course/GETTING_STARTED.md`, pointing first to readiness and the actual current lesson; design/evolution/architecture artifacts are optional reference.
+3. Aggregates the schema-v4 learner profile, learning mode, competency practice depths, empty initial practice evidence, foundation/milestone statuses, attempts, handoffs, and risks without deleting history.
 4. Runs the full validator **without** `--partial` and fixes cross-unit errors.
-5. Sets `course_status: ready` only when all required units are done. When milestone 1 has prerequisite work, it sets the first topologically available foundation as `current_unit` and keeps `current_milestone: 0`; otherwise it selects milestone 1. It then runs full validation again.
+5. Sets `course_status: ready` only when all required units are done. When milestone 1 has prerequisite work, it sets the first topologically available foundation as `current_unit` and keeps `current_milestone: 0`; otherwise it selects milestone 1. In either case it also sets `current_lesson` to that unit's first lesson, then runs full validation again.
 6. Reports scope, readiness decision, foundation/milestone counts, statuses, uncertainties, both readiness/roadmap paths, and the first learner action.
 
 ## Model routing and bounds

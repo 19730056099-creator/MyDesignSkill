@@ -7,7 +7,8 @@ Project2Learn 把成熟代码仓库转换成“从零重新发明它”的中英
 - 只读分析本地或 GitHub 仓库
 - 提取项目所需能力 DAG，并用短问答/微任务确认学习者真实起点和 `product_builder`、`cs_depth` 或 `balanced` 学习模式
 - 只为个人缺口生成传递依赖有序的前置补给，再进入 5–12 个项目里程碑
-- 用 `project-evolution.md` 和里程碑因果章节解释“上一版价值 → 新压力 → 设计变化 → 新限制”
+- 把因果链、能力、证据和验收藏在 `course/design/`，不把课程模型直接压给学习者
+- 用学习体验渲染器把每个单元拆成“一课一个认知目标”的短课：先做 → 观察 → 命名 → 最小解释 → 用回项目
 - 建立技术层级与故障定位地图，按“首次触摸 → 理解 → 亲手承担”组织实践
 - 明确每个单元中 AI 可生成什么、学习者必须操作/编写/解释和迁移什么
 - 同步维护 `zh-CN` 与 `en` 两套课程文件
@@ -34,7 +35,8 @@ Project2Learn 把成熟代码仓库转换成“从零重新发明它”的中英
 
 ```text
 project2learn/<repo>/
-├── course/zh-CN/    # 含 readiness、project-evolution、foundations、milestones
+├── course/design/   # 语言中立的密集课程设计 JSON
+├── course/zh-CN/    # readiness + foundation/milestone lesson bundles
 ├── course/en/
 ├── student/
 ├── reviews/zh-CN/

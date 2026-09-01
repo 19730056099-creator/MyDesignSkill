@@ -229,7 +229,7 @@ if (smallRepository && !forceFanout) {
 const learningMode = learnerProfile && learnerProfile.learning_mode;
 const validLearningMode = ['product_builder', 'cs_depth', 'balanced'].includes(learningMode);
 if (!learnerProfile || !validLearningMode) {
-  log('learner profile or v3 learning mode missing; producing a project-specific calibration instead of a fixed course');
+  log('learner profile or v4 learning mode missing; producing a project-specific calibration instead of a fixed course');
   const readiness = await agent([
     `Inspect only the manifests, entry points, acceptance commands, and documented primary path at ${reference}; do not modify the repository.`,
     `Read ${skillDir}/references/learner-readiness.md.`,
@@ -251,17 +251,17 @@ if (!strongModel) log('strongModel was not supplied; planner/finalizer will use 
 phase('📋 阶段2/4：分析与总规划');
 log('running one planner that also writes the neutral analysis model');
 const planner = await agent([
-  `You are the planner for Project2Learn fan-out generation v3.`,
+  `You are the planner for Project2Learn fan-out generation v4.`,
   `Skill dir: ${skillDir}. Reference repository (READ-ONLY): ${reference}. Workspace: ${workspace}.`,
-  `Read ${skillDir}/references/fanout-generation.md, repository-analysis.md, learner-readiness.md, reconstruction-method.md, and output-contract.md.`,
-  `Schema-v3 learner profile and learning mode: ${JSON.stringify(learnerProfile)}. Treat learner statements as learner evidence, never repository evidence. Do not turn the learning mode into a fixed percentage of learner-written code.`,
-  `Analyze the repository once and write the language-neutral repository, competency, project-evolution, technology-layer, troubleshooting, and spiral-practice models to ${workspace}/course/model/analysis-model.md. Do not create a separate analysis execution unit.`,
-  `Write ${orchDir}/conventions.md, ${orchDir}/brief.md (at most 500 words), and ${orchDir}/plan.json. Initialize schema-v3 progress.json and its orchestration object once, preserving prior history; executors must not edit progress.json.`,
+  `Read ${skillDir}/references/fanout-generation.md, repository-analysis.md, learner-readiness.md, reconstruction-method.md, learning-experience-renderer.md, and output-contract.md.`,
+  `Schema-v4 learner profile and learning mode: ${JSON.stringify(learnerProfile)}. Treat learner statements as learner evidence, never repository evidence. Do not turn the learning mode into a fixed percentage of learner-written code.`,
+  `Analyze the repository once and write the language-neutral repository, competency, project-evolution, technology-layer, troubleshooting, spiral-practice, and lesson models to ${workspace}/course/model/analysis-model.md. Do not create a separate analysis execution unit.`,
+  `Write ${orchDir}/conventions.md, ${orchDir}/brief.md (at most 500 words), and ${orchDir}/plan.json. Initialize schema-v4 progress.json and its orchestration object once, preserving prior history; executors must not edit progress.json.`,
   `Compute the learner-specific transitive prerequisite gap. Plan 0-6 independent, just-enough foundation units and 7-12 independent project milestone units; foundations do not count as milestones.`,
   `Static project-map, architecture, knowledge-graph, readiness, project-evolution, and roadmap files may appear as render units; the workflow will consolidate them into one writer.`,
-  `Render outputs must include paired course/<lang>/project-evolution.md, a project map with technology layers and troubleshooting paths, ${orchDir}/foundation-defs/<FOUNDATION-ID>.json for every foundation, and ${orchDir}/milestone-defs/<MILESTONE-ID>.json for every milestone. Evolution and milestone definitions must share one causal chain. Every unit definition must also contain first_touch, manual_actions, ai_allowed, must_explain, transfer_check, and reappears_in. Every execution unit consumes only its own definition and must not depend on another foundation or milestone.`,
+  `Render outputs must include paired optional-reference course/<lang>/project-evolution.md, a project map with technology layers and troubleshooting paths, ${orchDir}/foundation-defs/<FOUNDATION-ID>.json for every foundation, and ${orchDir}/milestone-defs/<MILESTONE-ID>.json for every milestone. Evolution and milestone definitions must share one causal chain. Every unit definition must contain first_touch, manual_actions, ai_allowed, must_explain, transfer_check, reappears_in, and 1-3 foundation or 2-5 milestone lesson definitions with one cognitive_goal each. Each foundation/milestone execution unit must output course/design/<kind>/<slug>.json plus matching course/zh-CN/<kind>/<slug>/NN.md and course/en/<kind>/<slug>/NN.md lesson files. Every execution unit consumes only its own definition and must not depend on another foundation or milestone.`,
   `Do not create a getting-started execution unit; finalize writes course/GETTING_STARTED.md.`,
-  `The execution brief must include concise output budgets: normally 500-900 words per localized core artifact, 400-800 words per localized foundation, and 700-1200 words per localized milestone, with no copied source implementation.`,
+  `The execution brief must include concise output budgets: normally 500-900 words per localized reference artifact and 250-600 words per learner lesson, with no copied source implementation.`,
   `Return only the requested structured plan and the exact brief text.`,
 ].join('\n'), agentOptions('fanout-planner', strongModel, PLAN_SCHEMA));
 
@@ -288,14 +288,14 @@ function executorPrompt(unit, attempt, rejection) {
   const upstream = (unit.depends_on || []).map(id => `${id}: ${handoffs[id] || '(missing handoff)'}`).join('\n');
   const selectedOutputs = (unit.outputs || []).map(path => `--only ${path}`).join(' ');
   return [
-    `You are execution unit ${unit.id} in Project2Learn fan-out v3. The reference is READ-ONLY: ${reference}. Workspace: ${workspace}.`,
+    `You are execution unit ${unit.id} in Project2Learn fan-out v4. The reference is READ-ONLY: ${reference}. Workspace: ${workspace}.`,
     `Authoritative execution brief:`,
     brief,
     `Your unit: ${JSON.stringify(unit)}`,
     upstream ? `Upstream handoffs:\n${upstream}` : '',
     `Read only declared inputs and files needed to verify source evidence. Write only declared outputs plus your unique status file ${orchDir}/unit-status/${unit.id}.json.`,
     `Do not edit progress.json; the finalizer is its only post-planning writer.`,
-    `Keep prose within the brief's output budgets. Use the schema-v3 Touch → Understand → Own sections. State AI allowance, learner-owned critical practice, explanation, and transfer checks explicitly. Do not duplicate mature source code or repeat the same evidence explanation across sections.`,
+    `Keep prose within the brief's output budgets. Read learning-experience-renderer.md. Put dense causality, evidence, exact AI boundaries, acceptance, and hints in the unit design JSON. Render learner lessons as action → observation → concept name → minimum theory → project use → project growth → next problem. One lesson has one cognitive goal. Express AI guidance naturally; do not expose design-field headings or repeat source evidence in learner prose.`,
     `After writing, run isolated validation: python3 ${skillDir}/scripts/validate_course.py ${workspace} --partial ${selectedOutputs}`,
     `Fix errors in your declared outputs and rerun. --only isolates this unit from files being published concurrently; never run workspace-wide or full validation here.`,
     rejection ? `Previous attempt failed: ${rejection}` : '',
@@ -379,14 +379,14 @@ const failed = plan.filter(unit => status[unit.id] !== 'done').map(unit => unit.
 phase('✅ 阶段4/4：单写者收尾');
 log(failed.length ? `finalizing with failed/blocked units: ${failed.join(', ')}` : 'all execution units done; running full validation');
 const report = await agent([
-  `Finalize Project2Learn fan-out v3 as the only post-planning writer of progress.json.`,
+  `Finalize Project2Learn fan-out v4 as the only post-planning writer of progress.json.`,
   `Workspace: ${workspace}. Reference: ${reference}. Skill dir: ${skillDir}.`,
   `Unit statuses: ${JSON.stringify(status)}. Failed or blocked: ${JSON.stringify(failed)}.`,
   `Read ${orchDir}/conventions.md, unit-status files, course artifacts, and Phase F of fanout-generation.md.`,
-  `Create the course-specific bilingual course/GETTING_STARTED.md here; there is intentionally no separate getting-started executor. Use artifact_id getting-started, language bilingual, every required bilingual heading from output-contract.md, and point to readiness, project-evolution, the technology map, and the actual current foundation or milestone.`,
-  `Aggregate orchestration statuses, the schema-v3 learner profile and learning mode, competency practice depths, empty initial practice_evidence, foundation records, milestone records, handoffs, and risks into schema-v3 progress.json without discarding history.`,
+  `Create the course-specific bilingual course/GETTING_STARTED.md here; there is intentionally no separate getting-started executor. Use artifact_id getting-started, language bilingual, every required bilingual heading from output-contract.md, and point first to readiness and the actual current lesson. Mark project-evolution, knowledge-graph, architecture, roadmap, and course/design as optional reference/designer material.`,
+  `Aggregate orchestration statuses, the schema-v4 learner profile and learning mode, competency practice depths, empty initial practice_evidence, foundation records, milestone records, handoffs, and risks into schema-v4 progress.json without discarding history.`,
   `Run full validation without --partial: python3 ${skillDir}/scripts/validate_course.py ${workspace}. Fix structural and cross-unit errors, then rerun.`,
-  `Only if every required unit is done and validation passes, set course_status to ready. If milestone 1 still has required foundation work, set learning_phase to foundations, current_unit to the first topologically available foundation, and current_milestone to 0. Otherwise set learning_phase to milestones, current_unit to milestone-01, and current_milestone to 1. Then run full validation again.`,
+  `Only if every required unit is done and validation passes, set course_status to ready. If milestone 1 still has required foundation work, set learning_phase to foundations, current_unit to the first topologically available foundation, current_lesson to its first lesson, and current_milestone to 0. Otherwise set learning_phase to milestones, current_unit to milestone-01, current_lesson to lesson-01, and current_milestone to 1. Then run full validation again.`,
   `Return a concise Chinese report: scope, readiness decision, foundation and milestone counts, unit statuses, uncertainties, both readiness/roadmap paths, and the learner's first action.`,
 ].join('\n'), agentOptions('fanout-finalize', strongModel, null));
 

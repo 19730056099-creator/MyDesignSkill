@@ -22,8 +22,8 @@ class FanoutWorkflowContractTests(unittest.TestCase):
         self.assertIn("mode: 'single_required'", self.script)
 
     def test_planner_analyzes_once_and_milestones_are_one_parallel_wave(self) -> None:
-        self.assertIn("technology-layer, troubleshooting, and spiral-practice models", self.script)
-        self.assertIn("paired course/<lang>/project-evolution.md", self.script)
+        self.assertIn("technology-layer, troubleshooting, spiral-practice, and lesson models", self.script)
+        self.assertIn("paired optional-reference course/<lang>/project-evolution.md", self.script)
         self.assertIn("Do not create a separate analysis execution unit", self.script)
         self.assertIn("depends_on: [render.id]", self.script)
         self.assertIn("await parallel(ready.map", self.script)
@@ -36,11 +36,13 @@ class FanoutWorkflowContractTests(unittest.TestCase):
         self.assertIn("validLearningMode", self.script)
         self.assertIn("product_builder", self.script)
 
-    def test_schema3_units_define_touch_and_ai_boundaries(self) -> None:
+    def test_schema4_units_define_touch_ai_boundaries_and_lessons(self) -> None:
         for field in (
             "first_touch", "manual_actions", "ai_allowed", "must_explain", "transfer_check", "reappears_in"
         ):
             self.assertIn(field, self.script)
+        self.assertIn("one cognitive_goal", self.script)
+        self.assertIn("course/design/<kind>/<slug>.json", self.script)
         self.assertNotIn("'getting-started']", self.script)
 
     def test_foundations_are_bounded_and_parallel_after_render(self) -> None:
@@ -64,9 +66,11 @@ class FanoutWorkflowContractTests(unittest.TestCase):
         for schema in ("PREFLIGHT_SCHEMA", "PLAN_SCHEMA", "EXEC_SCHEMA", "REVIEW_SCHEMA"):
             self.assertIn(schema, self.script)
 
-    def test_agents_summary_documents_v3_safety_rules(self) -> None:
+    def test_agents_summary_documents_v4_safety_rules(self) -> None:
         agents = (SKILL_ROOT / "AGENTS.md").read_text(encoding="utf-8")
-        self.assertIn("Fan-out v3", agents)
+        self.assertIn("Fan-out v4", agents)
+        self.assertIn("course/design/", agents)
+        self.assertIn("一课一个认知目标", agents)
         self.assertIn("≥~20 个相关文件", agents)
         self.assertIn("不得彼此串联", agents)
         self.assertIn("orchestration/unit-status/<ID>.json", agents)

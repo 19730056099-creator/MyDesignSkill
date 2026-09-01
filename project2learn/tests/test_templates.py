@@ -12,6 +12,7 @@ from scripts.validate_course import (
     V3_CORE_HEADINGS,
     V3_FOUNDATION_HEADINGS,
     V3_MILESTONE_HEADINGS,
+    V4_LESSON_HEADINGS,
 )
 
 
@@ -34,6 +35,21 @@ class TemplateContractTests(unittest.TestCase):
             self.assertTrue(set(REVIEW_HEADINGS[language]).issubset(set(review.splitlines())))
             for key in ("artifact_id:", "language:", "review_id:", "milestone_id:", "verdict:"):
                 self.assertIn(key, review)
+            lesson_lines = set(
+                (templates / language / "lesson.md").read_text(encoding="utf-8").splitlines()
+            )
+            self.assertTrue(set(V4_LESSON_HEADINGS[language]).issubset(lesson_lines))
+
+        milestone_design = json.loads(
+            (templates / "milestone-design.json").read_text(encoding="utf-8")
+        )
+        foundation_design = json.loads(
+            (templates / "foundation-design.json").read_text(encoding="utf-8")
+        )
+        self.assertIn("causal_stage", milestone_design)
+        self.assertEqual(len(milestone_design["lessons"]), 2)
+        self.assertIn("why_now", foundation_design)
+        self.assertEqual(foundation_design["lessons"][0]["id"], "lesson-01")
 
     def test_progress_template_contains_required_language_neutral_fields(self) -> None:
         progress = json.loads(
@@ -45,6 +61,7 @@ class TemplateContractTests(unittest.TestCase):
             "course_status",
             "learning_phase",
             "current_unit",
+            "current_lesson",
             "current_milestone",
             "learner_profile",
             "assessment_history",
@@ -58,9 +75,10 @@ class TemplateContractTests(unittest.TestCase):
             "recommended_next_action",
         }
         self.assertEqual(set(progress), required)
-        self.assertEqual(progress["schema_version"], 3)
+        self.assertEqual(progress["schema_version"], 4)
         self.assertEqual(progress["learning_phase"], "assessing")
         self.assertEqual(progress["current_unit"], {"kind": "assessment", "id": "readiness"})
+        self.assertIsNone(progress["current_lesson"])
         self.assertEqual(progress["learner_profile"]["learning_mode"], "pending")
         self.assertEqual(progress["practice_evidence"], [])
 

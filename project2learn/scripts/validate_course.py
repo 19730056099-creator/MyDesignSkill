@@ -82,6 +82,26 @@ V3_CORE_HEADINGS["en"]["knowledge-graph.md"] += ["## Spiral Recurrence and Under
 V3_CORE_HEADINGS["zh-CN"]["readiness.md"] += ["## 学习模式与 AI 边界"]
 V3_CORE_HEADINGS["en"]["readiness.md"] += ["## Learning Mode and AI Boundary"]
 
+V4_LESSON_HEADINGS = {
+    "zh-CN": [
+        "## 先试一下", "## 你看到了什么", "## 只讲现在需要的",
+        "## 把它用回项目", "## 停一下，自己做", "## 现在你的项目可以",
+        "## 下一步会遇到什么",
+    ],
+    "en": [
+        "## Try This First", "## What Did You Notice?", "## Only What You Need Now",
+        "## Put It Back Into the Project", "## Stop and Do It Yourself",
+        "## What Your Project Can Do Now", "## The Next Problem",
+    ],
+}
+
+V4_FORBIDDEN_LEARNER_HEADINGS = {
+    "## 当前版本", "## 上一版本解决了什么", "## 用户遇到的新问题", "## 本阶段引入什么",
+    "## 证据台账", "## AI 使用边界", "## Current Version",
+    "## What the Previous Version Solved", "## New User Problem",
+    "## What This Stage Introduces", "## Evidence Ledger", "## AI Usage Boundary",
+}
+
 GETTING_STARTED_HEADINGS = [
     "# 学习指南 / Learning Guide",
     "## 课程是什么 / What This Course Is",
@@ -163,7 +183,7 @@ def _check_getting_started(path: Path, errors: list[str], *, strict: bool) -> No
         errors.append("course/GETTING_STARTED.md missing artifact_id: getting-started")
     if strict:
         if _metadata(text, "language") != "bilingual":
-            errors.append("course/GETTING_STARTED.md schema-v3 guide requires language: bilingual")
+            errors.append("course/GETTING_STARTED.md schema-v3+ guide requires language: bilingual")
         lines = {line.strip() for line in text.splitlines()}
         for heading in GETTING_STARTED_HEADINGS:
             if heading not in lines:
@@ -187,6 +207,395 @@ def _check_evidence(path: Path, text: str, errors: list[str]) -> int:
         ):
             errors.append(f"{path.as_posix()} teaching_inference requires confidence")
     return len(evidence_blocks)
+
+
+def _check_v4_design(
+    path: Path, kind: str, expected_number: int, errors: list[str]
+) -> tuple[dict | None, dict[str, dict]]:
+    relative = path.as_posix()
+    try:
+        design = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        errors.append(f"invalid unit design {relative}: {error}")
+        return None, {}
+    if not isinstance(design, dict):
+        errors.append(f"{relative} design must be object")
+        return None, {}
+
+    for key in (
+        "schema_version", "artifact_id", "unit_id", "kind", "number", "slug",
+        "competencies", "prerequisite_foundations", "practice_design", "acceptance",
+        "hints", "source_bridge", "evidence", "lessons",
+    ):
+        if key not in design:
+            errors.append(f"{relative} design missing {key}")
+    if design.get("schema_version") != 1:
+        errors.append(f"{relative} design schema_version must be 1")
+    if design.get("kind") != kind:
+        errors.append(f"{relative} design kind must be {kind}")
+    if design.get("number") != expected_number:
+        errors.append(f"{relative} design number must be {expected_number}")
+    expected_id = f"{'foundation' if kind == 'foundation' else 'milestone'}-{expected_number:02d}"
+    if design.get("unit_id") != expected_id:
+        errors.append(f"{relative} design unit_id must be {expected_id}")
+    if design.get("artifact_id") != f"{expected_id}-design":
+        errors.append(f"{relative} design artifact_id must be {expected_id}-design")
+    if not isinstance(design.get("slug"), str) or not design.get("slug"):
+        errors.append(f"{relative} design slug must be non-empty string")
+    else:
+        filename_slug = re.sub(r"^(?:F)?\d{2}-", "", path.stem, flags=re.IGNORECASE)
+        if design["slug"] != filename_slug:
+            errors.append(f"{relative} design slug must match filename: {filename_slug}")
+    for key in ("competencies", "prerequisite_foundations", "acceptance", "source_bridge", "evidence"):
+        if not isinstance(design.get(key), list):
+            errors.append(f"{relative} design {key} must be list")
+
+    if kind == "foundation":
+        if not isinstance(design.get("why_now"), str) or not design.get("why_now"):
+            errors.append(f"{relative} foundation design requires why_now")
+    else:
+        causal = design.get("causal_stage")
+        causal_keys = (
+            "current_version", "previous_value", "new_problem", "introduced_change",
+            "resolved_pressure", "deferred_limit", "next_pressure",
+        )
+        if not isinstance(causal, dict):
+            errors.append(f"{relative} milestone design requires causal_stage object")
+        else:
+            for key in causal_keys:
+                if not isinstance(causal.get(key), str) or not causal[key]:
+                    errors.append(f"{relative} causal_stage.{key} must be non-empty string")
+
+    practice = design.get("practice_design")
+    if not isinstance(practice, dict):
+        errors.append(f"{relative} design practice_design must be object")
+    else:
+        for key in ("ai_allowed", "learner_owned", "must_explain", "transfer_checks"):
+            if not isinstance(practice.get(key), list):
+                errors.append(f"{relative} practice_design.{key} must be list")
+
+    acceptance = design.get("acceptance")
+    if isinstance(acceptance, list):
+        if not acceptance:
+            errors.append(f"{relative} design requires at least one acceptance item")
+        for index, item in enumerate(acceptance):
+            if not isinstance(item, dict) or not isinstance(item.get("id"), str) or not item["id"]:
+                errors.append(f"{relative} acceptance[{index}] requires non-empty id")
+
+    hints = design.get("hints")
+    if not isinstance(hints, list) or [hint.get("level") for hint in hints if isinstance(hint, dict)] != [1, 2, 3, 4, 5]:
+        errors.append(f"{relative} design requires hint levels 1-5 in order")
+    elif any(not isinstance(hint.get("content"), str) or not hint["content"] for hint in hints):
+        errors.append(f"{relative} design hint content must be non-empty")
+
+    evidence = design.get("evidence")
+    if isinstance(evidence, list):
+        if not evidence:
+            errors.append(f"{relative} design requires at least one evidence entry")
+        for index, entry in enumerate(evidence):
+            prefix = f"{relative} evidence[{index}]"
+            if not isinstance(entry, dict):
+                errors.append(f"{prefix} must be object")
+                continue
+            evidence_type = entry.get("type")
+            if evidence_type not in {"code_evidence", "document_evidence", "teaching_inference"}:
+                errors.append(f"{prefix} has invalid type: {evidence_type}")
+            for key in ("source", "rationale"):
+                if not isinstance(entry.get(key), str) or not entry[key]:
+                    errors.append(f"{prefix}.{key} must be non-empty string")
+            if evidence_type == "teaching_inference" and entry.get("confidence") not in {"low", "medium", "high"}:
+                errors.append(f"{prefix} teaching_inference requires confidence")
+
+    lessons = design.get("lessons")
+    minimum, maximum = (1, 3) if kind == "foundation" else (2, 5)
+    if not isinstance(lessons, list) or not minimum <= len(lessons) <= maximum:
+        errors.append(f"{relative} {kind} design requires {minimum}-{maximum} lessons")
+        return design, {}
+    lesson_map: dict[str, dict] = {}
+    required_lesson_fields = (
+        "id", "artifact_id", "cognitive_goal", "situation", "friction", "action",
+        "observable_result", "concept_name", "minimum_theory", "project_delta", "next_problem",
+    )
+    for index, lesson in enumerate(lessons, 1):
+        prefix = f"{relative} lessons[{index - 1}]"
+        if not isinstance(lesson, dict):
+            errors.append(f"{prefix} must be object")
+            continue
+        expected_lesson_id = f"lesson-{index:02d}"
+        if lesson.get("id") != expected_lesson_id:
+            errors.append(f"{prefix}.id must be {expected_lesson_id}")
+        expected_artifact = f"{expected_id}-{expected_lesson_id}"
+        if lesson.get("artifact_id") != expected_artifact:
+            errors.append(f"{prefix}.artifact_id must be {expected_artifact}")
+        for key in required_lesson_fields:
+            if not isinstance(lesson.get(key), str) or not lesson[key]:
+                errors.append(f"{prefix}.{key} must be non-empty string")
+        deferred = lesson.get("deferred")
+        if deferred is not None:
+            if not isinstance(deferred, dict):
+                errors.append(f"{prefix}.deferred must be null or object")
+            else:
+                for key in ("concept", "why_not_now", "revisit_when"):
+                    if not isinstance(deferred.get(key), str) or not deferred[key]:
+                        errors.append(f"{prefix}.deferred.{key} must be non-empty string")
+        lesson_map[f"{index:02d}.md"] = lesson
+    return design, lesson_map
+
+
+def _check_v4_lesson(
+    path: Path, language: str, unit_id: str, lesson: dict, errors: list[str]
+) -> str:
+    text = _check_headings(path, V4_LESSON_HEADINGS[language], errors)
+    relative = path.as_posix()
+    metadata = _frontmatter(text)
+    if metadata is None:
+        errors.append(f"{relative} missing opening frontmatter")
+        return text
+    expected = {
+        "artifact_id": lesson.get("artifact_id"),
+        "language": language,
+        "unit_id": unit_id,
+        "lesson_id": lesson.get("id"),
+    }
+    for key, value in expected.items():
+        if metadata.get(key) != value:
+            errors.append(f"{relative} {key} must be {value}")
+    lines = {line.strip() for line in text.splitlines()}
+    leaked = sorted(lines & V4_FORBIDDEN_LEARNER_HEADINGS)
+    for heading in leaked:
+        errors.append(f"{relative} exposes design-layer heading: {heading}")
+    optional = "## 现在先不讲" if language == "zh-CN" else "## Not Now"
+    optional_count = text.count(optional)
+    if optional_count > 1:
+        errors.append(f"{relative} may contain at most one {optional} section")
+    if lesson.get("deferred") is None and optional_count:
+        errors.append(f"{relative} has an undeclared {optional} section")
+    if lesson.get("deferred") is not None and optional_count != 1:
+        errors.append(f"{relative} must render its declared {optional} section")
+    return text
+
+
+def _validate_v4_bundles(
+    workspace: Path, kind: str, errors: list[str], *, partial: bool
+) -> tuple[list[str], dict[str, list[str]]]:
+    plural = "foundations" if kind == "foundation" else "milestones"
+    design_root = workspace / "course" / "design" / plural
+    if not design_root.is_dir():
+        if not partial:
+            errors.append(f"missing course/design/{plural} directory")
+        return [], {}
+    design_paths = sorted(design_root.glob("*.json"))
+    design_stems = {path.stem for path in design_paths}
+    localized_stems = {}
+    for language in LANGUAGES:
+        localized_root = workspace / "course" / language / plural
+        localized_stems[language] = {
+            path.name for path in localized_root.iterdir() if path.is_dir()
+        } if localized_root.is_dir() else set()
+        legacy_files = sorted(path.name for path in localized_root.glob("*.md"))
+        if legacy_files:
+            errors.append(
+                f"schema-v4 {plural} must use lesson directories, not single files: {legacy_files}"
+            )
+    if localized_stems["zh-CN"] != localized_stems["en"]:
+        errors.append(f"{kind} lesson bundle sets differ between zh-CN and en")
+    if not partial:
+        for stem in sorted(design_stems - localized_stems["zh-CN"]):
+            errors.append(f"missing bilingual {kind} lesson bundle: {stem}")
+        for stem in sorted(localized_stems["zh-CN"] - design_stems):
+            errors.append(f"{kind} lesson bundle lacks design JSON: {stem}")
+
+    ids: list[str] = []
+    unit_lessons: dict[str, list[str]] = {}
+    numbers: list[int] = []
+    pattern = r"^F(\d{2})-" if kind == "foundation" else r"^(\d{2})-"
+    for design_path in design_paths:
+        match = re.match(pattern, design_path.name, re.IGNORECASE if kind == "foundation" else 0)
+        if not match:
+            errors.append(f"{kind} design filename lacks numeric prefix: {design_path.name}")
+            continue
+        number = int(match.group(1))
+        numbers.append(number)
+        design, lesson_map = _check_v4_design(design_path, kind, number, errors)
+        if design is None:
+            continue
+        unit_id = design.get("unit_id")
+        if isinstance(unit_id, str):
+            ids.append(unit_id)
+            unit_lessons[unit_id] = [lesson.get("id") for lesson in lesson_map.values()]
+        if design_path.stem not in localized_stems["zh-CN"] & localized_stems["en"]:
+            continue
+        expected_files = set(lesson_map)
+        texts: dict[tuple[str, str], str] = {}
+        for language in LANGUAGES:
+            unit_root = workspace / "course" / language / plural / design_path.stem
+            actual_files = {path.name for path in unit_root.glob("*.md")}
+            if actual_files != expected_files:
+                errors.append(
+                    f"course/{language}/{plural}/{design_path.stem} lesson files "
+                    f"must be {sorted(expected_files)}"
+                )
+            for filename in sorted(actual_files & expected_files):
+                lesson_path = unit_root / filename
+                texts[(language, filename)] = _check_v4_lesson(
+                    lesson_path, language, unit_id, lesson_map[filename], errors
+                )
+        for filename in sorted(expected_files):
+            zh = texts.get(("zh-CN", filename))
+            en = texts.get(("en", filename))
+            if zh is None or en is None:
+                continue
+            for key in ("artifact_id", "unit_id", "lesson_id"):
+                if _metadata(zh, key) != _metadata(en, key):
+                    errors.append(f"{key} differs for {plural}/{design_path.stem}/{filename}")
+    if sorted(numbers) != list(range(1, len(numbers) + 1)):
+        errors.append(f"{kind} design numbers must be consecutive from 1")
+    return ids, unit_lessons
+
+
+def _validate_v4_reviews(
+    workspace: Path, milestone_ids: list[str], errors: list[str]
+) -> dict[str, dict[str, str]]:
+    review_paths = {
+        language: sorted((workspace / "reviews" / language).glob("*.md"))
+        for language in LANGUAGES
+    }
+    names = {language: {path.name for path in paths} for language, paths in review_paths.items()}
+    if names["zh-CN"] != names["en"]:
+        errors.append("review file sets differ between zh-CN and en")
+    reviews: dict[str, dict[str, str]] = {}
+    for filename in sorted(names["zh-CN"] & names["en"]):
+        texts = {}
+        for language in LANGUAGES:
+            path = workspace / "reviews" / language / filename
+            text = _check_headings(path, REVIEW_HEADINGS[language], errors)
+            texts[language] = text
+            for key in ("artifact_id", "review_id", "milestone_id", "verdict"):
+                if not _metadata(text, key):
+                    errors.append(f"{path.relative_to(workspace).as_posix()} missing {key}")
+            if _metadata(text, "language") != language:
+                errors.append(f"{path.relative_to(workspace).as_posix()} has incorrect language metadata")
+            if _check_evidence(path.relative_to(workspace), text, errors) == 0:
+                errors.append(f"{path.relative_to(workspace).as_posix()} requires at least one evidence entry")
+        for key in ("artifact_id", "review_id", "milestone_id", "verdict"):
+            if _metadata(texts["zh-CN"], key) != _metadata(texts["en"], key):
+                errors.append(f"review {key} differs for {filename}")
+        for key, label in (("source", "review source locations"), ("acceptance_id", "review acceptance IDs"), ("command", "review commands")):
+            if _values(texts["zh-CN"], key) != _values(texts["en"], key):
+                errors.append(f"{label} differ for {filename}")
+        review_id = _metadata(texts["zh-CN"], "review_id")
+        milestone_id = _metadata(texts["zh-CN"], "milestone_id")
+        verdict = _metadata(texts["zh-CN"], "verdict")
+        if verdict not in {"passed", "needs_revision", "skipped_with_risk"}:
+            errors.append(f"invalid review verdict for {filename}: {verdict}")
+        if milestone_id not in milestone_ids:
+            errors.append(f"review references unknown milestone for {filename}: {milestone_id}")
+        if review_id and milestone_id and verdict:
+            reviews[review_id] = {"milestone_id": milestone_id, "verdict": verdict}
+    return reviews
+
+
+def _validate_v4_workspace(
+    workspace: Path, progress: dict, *, partial: bool
+) -> list[str]:
+    errors: list[str] = []
+    core_texts: dict[str, dict[str, str]] = {language: {} for language in LANGUAGES}
+    if not (workspace / "student").is_dir():
+        errors.append("missing student directory")
+    for language in LANGUAGES:
+        if not (workspace / "reviews" / language).is_dir():
+            errors.append(f"missing reviews/{language} directory")
+        course_root = workspace / "course" / language
+        for filename in CORE_HEADINGS[language]:
+            path = course_root / filename
+            relative = path.relative_to(workspace)
+            if not path.is_file():
+                if not partial:
+                    errors.append(f"missing {relative.as_posix()}")
+                continue
+            text = _check_headings(path, V3_CORE_HEADINGS[language][filename], errors)
+            core_texts[language][filename] = text
+            if _metadata(text, "artifact_id") is None:
+                errors.append(f"{relative.as_posix()} missing artifact_id")
+            if _metadata(text, "language") != language:
+                errors.append(f"{relative.as_posix()} has incorrect language metadata")
+            evidence_count = _check_evidence(relative, text, errors)
+            if filename in {"project-map.md", "architecture.md", "project-evolution.md", "roadmap.md"} and evidence_count == 0:
+                errors.append(f"{relative.as_posix()} requires at least one evidence entry")
+    for filename in CORE_HEADINGS["en"]:
+        zh = core_texts["zh-CN"].get(filename)
+        en = core_texts["en"].get(filename)
+        if zh is None or en is None:
+            if partial and (zh is None) != (en is None):
+                errors.append(f"unpaired partial core artifact: {filename}")
+            continue
+        if _metadata(zh, "artifact_id") != _metadata(en, "artifact_id"):
+            errors.append(f"artifact_id mismatch for {filename}")
+        if _values(zh, "source") != _values(en, "source"):
+            errors.append(f"source locations differ for {filename}")
+        if filename == "readiness.md":
+            for key, label in (
+                ("competency_id", "competency IDs"), ("state", "competency states"),
+                ("required_by", "readiness milestone links"),
+                ("foundation_id", "readiness foundation IDs"), ("learning_mode", "learning modes"),
+            ):
+                if _values(zh, key) != _values(en, key):
+                    errors.append(f"{label} differ for {filename}")
+        if filename == "project-map.md":
+            for key, label in (("layer_id", "technology layer IDs"), ("failure_id", "troubleshooting failure IDs")):
+                if _values(zh, key) != _values(en, key):
+                    errors.append(f"{label} differ for {filename}")
+        if filename == "knowledge-graph.md":
+            for key, label in (("practice_depth", "practice depths"), ("reappears_in", "spiral recurrence links")):
+                if _values(zh, key) != _values(en, key):
+                    errors.append(f"{label} differ for {filename}")
+
+    foundation_ids, foundation_lessons = _validate_v4_bundles(
+        workspace, "foundation", errors, partial=partial
+    )
+    milestone_ids, milestone_lessons = _validate_v4_bundles(
+        workspace, "milestone", errors, partial=partial
+    )
+    if len(foundation_ids) > 8:
+        errors.append("foundation route must stay bounded to at most 8 units")
+    status = progress.get("course_status")
+    if not partial and (status in ACTIVE_STATUSES or milestone_ids) and not 5 <= len(milestone_ids) <= 12:
+        errors.append(f"course requires 5-12 milestone bundles, found {len(milestone_ids)}")
+
+    guide = workspace / "course" / "GETTING_STARTED.md"
+    if status in ACTIVE_STATUSES:
+        if not guide.is_file():
+            errors.append("missing course/GETTING_STARTED.md learning-order guide")
+        else:
+            _check_getting_started(guide, errors, strict=True)
+    reviews = _validate_v4_reviews(workspace, milestone_ids, errors)
+
+    readiness = core_texts["zh-CN"].get("readiness.md")
+    profile = progress.get("learner_profile")
+    if readiness is not None and isinstance(profile, dict):
+        if _values(readiness, "learning_mode") != [profile.get("learning_mode")]:
+            errors.append("readiness learning_mode does not match progress learner profile")
+        records = profile.get("competencies")
+        if isinstance(records, list):
+            expected_ids = sorted(record.get("id") for record in records if isinstance(record, dict) and isinstance(record.get("id"), str))
+            expected_states = sorted(record.get("state") for record in records if isinstance(record, dict) and isinstance(record.get("state"), str))
+            if _values(readiness, "competency_id") != expected_ids:
+                errors.append("readiness competency IDs do not match progress learner profile")
+            if _values(readiness, "state") != expected_states:
+                errors.append("readiness competency states do not match progress learner profile")
+        foundation_records = progress.get("foundation_units")
+        if isinstance(foundation_records, list):
+            expected_foundations = sorted(
+                record.get("id") for record in foundation_records
+                if isinstance(record, dict) and isinstance(record.get("id"), str)
+            )
+            if _values(readiness, "foundation_id") != expected_foundations:
+                errors.append("readiness foundation IDs do not match progress foundation units")
+    unit_lessons = {**foundation_lessons, **milestone_lessons}
+    _validate_progress(
+        progress, foundation_ids, milestone_ids, reviews, errors, unit_lessons=unit_lessons
+    )
+    return errors
 
 
 def _load_progress(workspace: Path, errors: list[str]) -> dict | None:
@@ -233,14 +642,14 @@ def _validate_learner_profile(
         errors.append("progress.json learner_profile must be object")
         return {}
     required_profile_keys = ["assessment_mode", "goals", "constraints", "competencies"]
-    if schema_version == 3:
+    if schema_version in {3, 4}:
         required_profile_keys.append("learning_mode")
     for key in required_profile_keys:
         if key not in profile:
             errors.append(f"progress.json learner_profile missing {key}")
     if profile.get("assessment_mode") not in ASSESSMENT_MODES:
         errors.append(f"invalid learner assessment_mode: {profile.get('assessment_mode')}")
-    if schema_version == 3 and profile.get("learning_mode") not in LEARNING_MODES:
+    if schema_version in {3, 4} and profile.get("learning_mode") not in LEARNING_MODES:
         errors.append(f"invalid learner learning_mode: {profile.get('learning_mode')}")
     for key in ("goals", "constraints", "competencies"):
         if not isinstance(profile.get(key), list):
@@ -260,7 +669,7 @@ def _validate_learner_profile(
             "id", "category", "state", "evidence_level", "prerequisites",
             "required_by", "blocking", "evidence",
         ]
-        if schema_version == 3:
+        if schema_version in {3, 4}:
             required.append("practice_depth")
         for key in required:
             if key not in record:
@@ -280,7 +689,7 @@ def _validate_learner_profile(
             errors.append(f"{prefix} has invalid state: {state}")
         if level not in EVIDENCE_LEVELS:
             errors.append(f"{prefix} has invalid evidence_level: {level}")
-        if schema_version == 3 and record.get("practice_depth") not in PRACTICE_DEPTHS:
+        if schema_version in {3, 4} and record.get("practice_depth") not in PRACTICE_DEPTHS:
             errors.append(f"{prefix} has invalid practice_depth: {record.get('practice_depth')}")
         if state == "ready" and level not in {"self_reported", "demonstrated"}:
             errors.append(f"{prefix} ready state requires learner evidence")
@@ -326,6 +735,8 @@ def _validate_progress(
     milestone_ids: list[str],
     reviews: dict[str, dict[str, str]],
     errors: list[str],
+    *,
+    unit_lessons: dict[str, list[str]] | None = None,
 ) -> None:
     if progress is None:
         return
@@ -354,7 +765,7 @@ def _validate_progress(
     elif isinstance(progress["last_review"], str) and progress["last_review"] not in reviews:
         errors.append("progress.json last_review references unknown paired review")
     schema_version = progress.get("schema_version")
-    if schema_version not in {1, 2, 3}:
+    if schema_version not in {1, 2, 3, 4}:
         errors.append(f"unsupported schema_version: {schema_version}")
 
     repository = progress.get("repository")
@@ -368,7 +779,7 @@ def _validate_progress(
         errors.append(f"invalid course_status: {status}")
 
     competencies: dict[str, dict] = {}
-    if schema_version in {2, 3}:
+    if schema_version in {2, 3, 4}:
         for key, expected_type in {
             "learning_phase": str,
             "learner_profile": dict,
@@ -392,8 +803,8 @@ def _validate_progress(
             profile_mode = profile_value.get("assessment_mode") if isinstance(profile_value, dict) else None
             if profile_mode == "pending":
                 errors.append("active schema-v2+ course requires a readiness decision")
-            if schema_version == 3 and isinstance(profile_value, dict) and profile_value.get("learning_mode") == "pending":
-                errors.append("active schema-v3 course requires a learning_mode decision")
+            if schema_version in {3, 4} and isinstance(profile_value, dict) and profile_value.get("learning_mode") == "pending":
+                errors.append(f"active schema-v{schema_version} course requires a learning_mode decision")
             if isinstance(history, list) and not history:
                 errors.append("active schema-v2+ course requires assessment_history")
         if isinstance(history, list):
@@ -409,7 +820,7 @@ def _validate_progress(
                         errors.append(f"{prefix}.{key} must be non-empty string")
 
     practice_unit_ids: set[str] = set()
-    if schema_version == 3:
+    if schema_version in {3, 4}:
         practice = progress.get("practice_evidence")
         if not isinstance(practice, list):
             errors.append("progress.json practice_evidence must be list")
@@ -465,13 +876,13 @@ def _validate_progress(
             errors.append("progress milestone numbers must be consecutive from 1")
         if status in ACTIVE_STATUSES and progress_ids != milestone_ids:
             errors.append("progress milestone IDs do not match bilingual course files")
-        if schema_version == 3:
+        if schema_version in {3, 4}:
             for record in records:
                 if isinstance(record, dict) and record.get("status") == "passed" and record.get("id") not in practice_unit_ids:
                     errors.append(f"passed milestone requires practice evidence: {record.get('id')}")
 
     foundation_progress_ids: list[str] = []
-    if schema_version in {2, 3}:
+    if schema_version in {2, 3, 4}:
         foundation_records = progress.get("foundation_units")
         foundation_numbers: list[int] = []
         if isinstance(foundation_records, list):
@@ -515,7 +926,7 @@ def _validate_progress(
                 errors.append("progress foundation numbers must be consecutive from 1")
             if status in ACTIVE_STATUSES and foundation_progress_ids != foundation_ids:
                 errors.append("progress foundation IDs do not match bilingual course files")
-            if schema_version == 3:
+            if schema_version in {3, 4}:
                 for record in foundation_records:
                     if isinstance(record, dict) and record.get("status") == "passed" and record.get("id") not in practice_unit_ids:
                         errors.append(f"passed foundation requires practice evidence: {record.get('id')}")
@@ -525,7 +936,7 @@ def _validate_progress(
         if status in ACTIVE_STATUSES and isinstance(current, int):
             if not milestone_ids or not 1 <= current <= len(milestone_ids):
                 errors.append("current_milestone out of bounds")
-    elif schema_version in {2, 3}:
+    elif schema_version in {2, 3, 4}:
         current_unit = progress.get("current_unit")
         if status == "complete":
             if current_unit is not None:
@@ -580,6 +991,28 @@ def _validate_progress(
                 if waived and (not matching_record or not matching_record.get("risk_notes")):
                     errors.append("waived blocking competencies require milestone risk_notes")
 
+    if schema_version == 4:
+        if "current_lesson" not in progress:
+            errors.append("progress.json missing current_lesson")
+        current_lesson = progress.get("current_lesson")
+        current_unit = progress.get("current_unit")
+        if status == "complete" or (
+            isinstance(current_unit, dict) and current_unit.get("kind") == "assessment"
+        ):
+            if current_lesson is not None:
+                errors.append("assessment or complete course requires current_lesson null")
+        elif isinstance(current_unit, dict):
+            unit_id = current_unit.get("id")
+            if not isinstance(current_lesson, dict):
+                errors.append("active schema-v4 unit requires current_lesson object")
+            else:
+                if current_lesson.get("unit_id") != unit_id:
+                    errors.append("current_lesson.unit_id must match current_unit.id")
+                lesson_id = current_lesson.get("id")
+                known_lessons = (unit_lessons or {}).get(unit_id, [])
+                if lesson_id not in known_lessons:
+                    errors.append("current_lesson references unknown lesson")
+
     hints = progress.get("hint_history")
     if isinstance(hints, list):
         for index, hint in enumerate(hints):
@@ -623,7 +1056,7 @@ def _validate_progress(
             errors.append("complete course requires a final paired review")
 
 
-def validate_selected_files(workspace: Path, selected: list[str]) -> list[str]:
+def _validate_selected_files_legacy(workspace: Path, selected: list[str]) -> list[str]:
     """Validate one execution unit's declared outputs in isolation.
 
     Other fan-out agents may be publishing files concurrently, so selected-file
@@ -806,6 +1239,77 @@ def validate_selected_files(workspace: Path, selected: list[str]) -> list[str]:
     return errors
 
 
+def _validate_selected_v4(workspace: Path, selected: list[str]) -> list[str]:
+    workspace = Path(workspace).resolve()
+    errors: list[str] = []
+    nested: dict[tuple[str, str], dict[str, set[str]]] = {}
+    legacy_selected: list[str] = []
+    for raw in unique_preserving_order(selected):
+        relative = Path(raw)
+        if relative.is_absolute() or ".." in relative.parts:
+            errors.append(f"--only path must be workspace-relative: {raw}")
+            continue
+        path = workspace / relative
+        if not path.is_file():
+            errors.append(f"missing declared output: {relative.as_posix()}")
+            continue
+        parts = relative.parts
+        if (
+            len(parts) == 5 and parts[0] == "course" and parts[1] in LANGUAGES
+            and parts[2] in {"foundations", "milestones"} and path.suffix == ".md"
+        ):
+            language, plural, stem, filename = parts[1], parts[2], parts[3], parts[4]
+            nested.setdefault((plural, stem), {}).setdefault(filename, set()).add(language)
+        else:
+            legacy_selected.append(raw)
+    errors.extend(_validate_selected_files_legacy(workspace, legacy_selected))
+
+    for (plural, stem), files in nested.items():
+        kind = "foundation" if plural == "foundations" else "milestone"
+        match = re.match(r"^F(\d{2})-", stem, re.IGNORECASE) if kind == "foundation" else re.match(r"^(\d{2})-", stem)
+        if not match:
+            errors.append(f"{kind} lesson bundle lacks numeric prefix: {stem}")
+            continue
+        design_path = workspace / "course" / "design" / plural / f"{stem}.json"
+        if not design_path.is_file():
+            errors.append(f"missing unit design: course/design/{plural}/{stem}.json")
+            continue
+        design, lesson_map = _check_v4_design(design_path, kind, int(match.group(1)), errors)
+        if design is None:
+            continue
+        expected_files = set(lesson_map)
+        if set(files) != expected_files:
+            errors.append(f"selected {kind} bundle {stem} must declare lessons {sorted(expected_files)}")
+        unit_id = design.get("unit_id")
+        for filename, languages in files.items():
+            if languages != set(LANGUAGES):
+                errors.append(f"selected lesson is missing its language pair: {plural}/{stem}/{filename}")
+                continue
+            lesson = lesson_map.get(filename)
+            if lesson is None:
+                errors.append(f"selected lesson not declared by design: {plural}/{stem}/{filename}")
+                continue
+            texts = {}
+            for language in LANGUAGES:
+                path = workspace / "course" / language / plural / stem / filename
+                texts[language] = _check_v4_lesson(path, language, unit_id, lesson, errors)
+            for key in ("artifact_id", "unit_id", "lesson_id"):
+                if _metadata(texts["zh-CN"], key) != _metadata(texts["en"], key):
+                    errors.append(f"{key} differs for {plural}/{stem}/{filename}")
+    return errors
+
+
+def validate_selected_files(workspace: Path, selected: list[str]) -> list[str]:
+    progress_path = Path(workspace) / "progress.json"
+    try:
+        schema_version = json.loads(progress_path.read_text(encoding="utf-8")).get("schema_version")
+    except (OSError, json.JSONDecodeError, AttributeError):
+        schema_version = None
+    if schema_version == 4:
+        return _validate_selected_v4(workspace, selected)
+    return _validate_selected_files_legacy(workspace, selected)
+
+
 def unique_preserving_order(values: list[str]) -> list[str]:
     return list(dict.fromkeys(values))
 
@@ -823,6 +1327,8 @@ def validate_workspace(workspace: Path, *, partial: bool = False) -> list[str]:
     errors: list[str] = []
     progress = _load_progress(workspace, errors)
     schema_version = progress.get("schema_version") if isinstance(progress, dict) else None
+    if schema_version == 4:
+        return _validate_v4_workspace(workspace, progress, partial=partial)
     core_texts: dict[str, dict[str, str]] = {language: {} for language in LANGUAGES}
 
     if not (workspace / "student").is_dir():

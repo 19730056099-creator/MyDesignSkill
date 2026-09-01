@@ -33,7 +33,8 @@ Project2Learn 将成熟代码仓库转换为一门“从零重建”的中英双
 project2learn/<repository>/
 ├── course/
 │   ├── GETTING_STARTED.md
-│   ├── zh-CN/        # 含 readiness.md、foundations/、milestones/
+│   ├── design/       # 能力、因果、证据、验收、提示等语言中立设计 JSON
+│   ├── zh-CN/        # readiness + foundation/milestone 短课
 │   └── en/
 ├── student/
 ├── reviews/
@@ -97,7 +98,7 @@ Skill 会根据你的请求判断模式。为了避免误判，建议在请求�
 4. 建立语言中立的仓库模型与项目所需能力 DAG，并递归展开真正需要的前置依赖；
 5. 让你选择按零基础、短校准（通常 3–7 个能力问题，必要时一个微任务）或显式豁免，并按目标选择 `product_builder`、`cs_depth` 或 `balanced`；
 6. 根据个人缺口生成 `readiness.md` 和 0–8 个短前置补给，不发送去学完整系统课；
-7. 生成技术层级/故障定位地图、架构、知识图谱、项目演变史、路线图和 5–12 对中英文项目里程碑；每个单元包含首次触摸、AI 边界、亲手关键实践、解释/迁移检查；
+7. 先把技术地图、因果链、能力、证据、AI 边界、验收和提示写进 `course/design/`，再用学习体验渲染器把每个 foundation 拆成 1–3 课、每个 milestone 拆成 2–5 课；一课一个认知目标，先做和观察，再命名概念、讲当前所需并用回项目；
 8. 生成课程专属 `GETTING_STARTED.md`；
 9. 校验双语能力 ID、补给、命令、来源、验收项和状态；
 10. 将课程设为 `ready`。若里程碑 1 仍需补给，先进入 foundation 且 `current_milestone: 0`；否则进入里程碑 1。
@@ -138,11 +139,12 @@ Project2Learn 会先从选定项目路径提取能力依赖，再确认你的起
 ```text
 course/zh-CN/readiness.md
 course/en/readiness.md
-course/zh-CN/foundations/F01-*.md
-course/en/foundations/F01-*.md
+course/design/foundations/F01-*.json
+course/zh-CN/foundations/F01-*/01.md
+course/en/foundations/F01-*/01.md
 ```
 
-每个补给只讲项目当前会用到的最小子集，包含小例子、首次触摸、动手练习、AI 使用边界、理解与迁移检查、可观察通过标准、项目桥接和“暂不学习”边界。补给不计入 5–12 个项目里程碑。
+每个补给只讲项目当前会用到的最小子集，并拆成 1–3 节短课。精确 AI 边界、验收和“暂不学习”理由保存在 design JSON；教材先让你做一个小动作、看到结果，再讲当前所需并接回项目。补给不计入 5–12 个项目里程碑。
 
 只前置里程碑 1 真正需要的内容。数据库、并发、部署等知识会在第一个使用它的里程碑前及时补充，而不是开课前全部塞给你。
 
@@ -186,7 +188,7 @@ unseen → touched → explained → debugged → transferred
 
 完整 fan-out 前也必须提供学习者画像和学习模式：按零基础、短校准结果或显式豁免，加上 `product_builder`、`cs_depth` 或 `balanced`。缺少任一项时只返回 `assessment_required`，不继续生成固定路线。
 
-### v3 并行拓扑
+### v4 并行拓扑
 
 ```text
 Gate        规模判断 + 学习准备门控
@@ -194,7 +196,7 @@ Plan        一次完成仓库、能力 DAG、个人缺口和任务图
 Render      一个 writer 生成全部核心双语文件和单元定义
 Foundations 0–6 个独立补给文件并行生成
 Milestones  7–12 个独立项目里程碑在一波中并行
-Finalize    一个 writer 汇总 schema-v3 状态、选择首单元并完整校验
+Finalize    一个 writer 汇总 schema-v4 状态、选择首单元与首课并完整校验
 ```
 
 关键规则：
@@ -220,7 +222,7 @@ Finalize    一个 writer 汇总 schema-v3 状态、选择首单元并完整校�
 先读取 progress.json，只告诉我当前阶段、未解决反馈和下一步动作。
 ```
 
-Skill 会先读取 `progress.json`，再按 schema-v2/v3 的 `current_unit` 读取双语文件。旧 schema-v1/v2 课程不会被重置；在下一个尚未开始的单元前渐进补齐 v3 学习模式、实践深度和未来单元模板，不伪造过去的实践证据。
+Skill 会先读取 `progress.json`。schema-v4 按 `current_unit + current_lesson` 只打开当前双语短课和共享 design JSON；schema-v2/v3 继续读取原来的单文件单元。旧课程不会被强制迁移或重置，也不会伪造过去的实践证据。
 
 不会因为“继续学习”而重新生成整个课程。如果参考仓库 revision 与记录不一致，则课程转回 `analyzing`，保留旧 revision，并在重新分析后继续。
 
@@ -293,7 +295,7 @@ course/GETTING_STARTED.md
 - `needs_revision`：存在当前阶段必须修复的问题；
 - `skipped_with_risk`：学习者明确跳过并接受风险。
 
-简单的早期设计可以通过；不会仅因为缺少后期架构而判失败。但绕过当前里程碑学习约束的取巧实现，即使输出正确，也可能需要修改。schema-v3 单元通过时还要记录亲手动作、可观察结果、解释、AI 使用情况和达到的实践深度；“AI 生成后能运行”本身不是掌握证据。
+简单的早期设计可以通过；不会仅因为缺少后期架构而判失败。但绕过当前里程碑学习约束的取巧实现，即使输出正确，也可能需要修改。schema-v3+ 单元通过时还要记录亲手动作、可观察结果、解释、AI 使用情况和达到的实践深度；“AI 生成后能运行”本身不是掌握证据。
 
 评审文件保存在：
 
@@ -404,8 +406,11 @@ python3 <skill-dir>/scripts/validate_course.py <learning-workspace> --partial
 
 ```bash
 python3 <skill-dir>/scripts/validate_course.py <learning-workspace> --partial \
-  --only course/zh-CN/milestones/01-example.md \
-  --only course/en/milestones/01-example.md
+  --only course/design/milestones/01-example.json \
+  --only course/zh-CN/milestones/01-example/01.md \
+  --only course/en/milestones/01-example/01.md \
+  --only course/zh-CN/milestones/01-example/02.md \
+  --only course/en/milestones/01-example/02.md
 ```
 
 设置 `ready` 或 `complete` 前必须执行完整校验，不能使用 `--partial`。

@@ -6,11 +6,11 @@ Use this protocol for resume, readiness, foundation learning, hints, review, ski
 
 Read `progress.json` first.
 
-For schema v2 or v3, follow `current_unit`:
+For schema v4, follow `current_unit` plus `current_lesson`: read the language-neutral unit design and only the paired current lesson files. For schema v2/v3, keep using the paired single-file unit.
 
 - `assessment`: summarize only unresolved project-relevant calibration choices and ask the smallest useful question batch;
-- `foundation`: read both localized foundation files and summarize its exit criteria;
-- `milestone`: read both localized milestone files and summarize its objective and acceptance.
+- `foundation`: summarize the current lesson's small action and the unit's exit capability;
+- `milestone`: summarize the current lesson's product result while keeping unit acceptance in view.
 
 Confirm paired `artifact_id` values match. Preserve schema-v1/v2 active work and use the migration guidance in `learner-readiness.md` before the next unstarted unit; never invent prior practice evidence.
 
@@ -39,13 +39,15 @@ When evidence changes a competency:
 For both foundation and milestone units, use:
 
 ```text
-first touch → observable result → minimal explanation → learner-owned practice →
-explain/debug/transfer → review → next available unit
+small action → observable result or friction → one question → concept name →
+minimum explanation → learner-owned project action → product growth → next problem
 ```
+
+Advance `current_lesson` only after observable work. Review and pass the unit after its final lesson and unit-level acceptance evidence.
 
 Ask one useful question at a time. Prefer questions tied to behavior the learner can observe. When the learner already demonstrates understanding, move forward instead of repeating Socratic prompts.
 
-A foundation brief emphasizes the exit capability and project bridge. A milestone brief emphasizes observable project value and design pressure. Before work begins, state what AI may generate, what the learner must do manually, and what they must explain. Do not turn a foundation into a generic survey course.
+A foundation brief emphasizes the exit capability and project bridge. A milestone brief emphasizes observable project value. Keep exact design pressure and responsibility metadata in the design JSON. In learner-facing tutoring, express AI guidance naturally beside the critical action: explain why it is worth doing personally and suggest asking AI for a hint before a full solution. Do not turn a foundation into a generic survey course.
 
 ## 4. Hint ladder
 
@@ -81,7 +83,7 @@ For a foundation unit, report:
 5. required changes versus optional practice;
 6. verdict: `passed`, `needs_revision`, or `skipped_with_risk`.
 
-When a schema-v3 foundation passes, record one `practice_evidence` entry with the manual action, observable result, explanation, AI usage, timestamp, and achieved practice depth. Then mark its competencies `ready` with `evidence_level: demonstrated` and record `student_work` or `diagnostic_task` evidence.
+When a schema-v3+ foundation passes, record one `practice_evidence` entry with the manual action, observable result, explanation, AI usage, timestamp, and achieved practice depth. Then mark its competencies `ready` with `evidence_level: demonstrated` and record `student_work` or `diagnostic_task` evidence.
 
 For a project milestone, report:
 
@@ -94,7 +96,7 @@ For a project milestone, report:
 7. required changes, separated from optional improvements;
 8. verdict: `passed`, `needs_revision`, or `skipped_with_risk`.
 
-Do not fail an early implementation solely because it lacks a later-stage mechanism. Do not reward code that bypasses the unit's learning constraint even if it produces the right output. For schema v3, a passing milestone needs direct practice evidence as well as behavioral acceptance; generated code running successfully is not sufficient by itself.
+Do not fail an early implementation solely because it lacks a later-stage mechanism. Do not reward code that bypasses the unit's learning constraint even if it produces the right output. For schema v3+, a passing milestone needs direct practice evidence as well as behavioral acceptance; generated code running successfully is not sufficient by itself.
 
 ## 7. State transitions
 
@@ -109,10 +111,10 @@ Course status and learning phase are separate. `course_status: ready` means the 
 - before each next milestone: run the just-in-time readiness gate;
 - final milestone `passed` or `skipped_with_risk` → `complete`: all bilingual files still validate and a final bridge review exists.
 
-Keep `current_milestone: 0` when `current_unit.kind` is `assessment` or `foundation`. Set it to the matching number when the current unit is a milestone. At completion set `learning_phase: complete` and `current_unit: null`.
+Keep `current_milestone: 0` when `current_unit.kind` is `assessment` or `foundation`. Set it to the matching number when the current unit is a milestone. In schema v4, set `current_lesson` to the first lesson when entering a unit and advance it after each observed result. At completion set `learning_phase: complete`, `current_unit: null`, and `current_lesson: null`.
 
 For project milestones, update both localized review files with the same IDs, evidence, required changes, and verdict. For foundations, record completion and learner evidence in the single language-neutral `progress.json`; keep any localized completion explanation inside the paired foundation files. Then update `progress.json` once.
 
 ## 8. End each interaction
 
-State the current unit and status, one concrete next action, how it will be verified, and both localized file paths. During assessment, point to both localized `readiness.md` paths when they exist. Keep the response concise; the workspace is the durable course record.
+State the current unit, current lesson, and status, one concrete next action, how it will be verified, and both localized lesson paths. During assessment, point to both localized `readiness.md` paths when they exist. Keep the response concise; the workspace is the durable course record.

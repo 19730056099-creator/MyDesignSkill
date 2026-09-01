@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "artifact_id": "milestone-NN-design",
+  "unit_id": "milestone-NN",
+  "kind": "milestone",
+  "number": 0,
+  "slug": "slug",
+  "causal_stage": {
+    "current_version": "{{current_version}}",
+    "previous_value": "{{previous_value}}",
+    "new_problem": "{{new_problem}}",
+    "introduced_change": "{{introduced_change}}",
+    "resolved_pressure": "{{resolved_pressure}}",
+    "deferred_limit": "{{deferred_limit}}",
+    "next_pressure": "{{next_pressure}}"
+  },
+  "competencies": [],
+  "prerequisite_foundations": [],
+  "practice_design": {
+    "ai_allowed": [],
+    "learner_owned": [],
+    "must_explain": [],
+    "transfer_checks": []
+  },
+  "acceptance": [
+    {"id": "mNN-a01", "result": "{{observable_acceptance}}"}
+  ],
+  "hints": [
+    {"level": 1, "content": "{{observation_hint}}"},
+    {"level": 2, "content": "{{concept_hint}}"},
+    {"level": 3, "content": "{{strategy_hint}}"},
+    {"level": 4, "content": "{{pseudocode_hint}}"},
+    {"level": 5, "content": "{{reference_hint}}"}
+  ],
+  "source_bridge": [],
+  "evidence": [
+    {
+      "type": "teaching_inference",
+      "source": "{{repository/path::symbol}}",
+      "confidence": "medium",
+      "rationale": "{{why_this_stage_order_is_useful}}"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "lesson-01",
+      "artifact_id": "milestone-NN-lesson-01",
+      "cognitive_goal": "{{one_cognitive_goal}}",
+      "situation": "{{situation}}",
+      "friction": "{{visible_friction}}",
+      "action": "{{small_action}}",
+      "observable_result": "{{observable_result}}",
+      "concept_name": "{{concept_named_after_experience}}",
+      "minimum_theory": "{{only_what_is_needed_now}}",
+      "project_delta": "{{what_the_project_can_do_now}}",
+      "next_problem": "{{next_natural_problem}}",
+      "deferred": null
+    },
+    {
+      "id": "lesson-02",
+      "artifact_id": "milestone-NN-lesson-02",
+      "cognitive_goal": "{{one_cognitive_goal}}",
+      "situation": "{{situation}}",
+      "friction": "{{visible_friction}}",
+      "action": "{{small_action}}",
+      "observable_result": "{{observable_result}}",
+      "concept_name": "{{concept_named_after_experience}}",
+      "minimum_theory": "{{only_what_is_needed_now}}",
+      "project_delta": "{{what_the_project_can_do_now}}",
+      "next_problem": "{{next_natural_problem}}",
+      "deferred": null
+    }
+  ]
+}

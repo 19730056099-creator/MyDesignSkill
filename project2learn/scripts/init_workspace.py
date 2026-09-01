@@ -22,15 +22,13 @@ contract in references/output-contract.md (artifact_id: getting-started).
 
 ## Suggested reading order / 建议阅读顺序
 
-1. `course/<lang>/project-map.md` — purpose, user journey, subsystems
-2. `course/<lang>/knowledge-graph.md` — project-required competency dependencies
-3. `course/<lang>/readiness.md` — your baseline, gaps, and personalized entry conditions
-4. `course/<lang>/foundations/FNN-*.md` — only the prerequisite bridges you need
-5. `course/<lang>/project-evolution.md` — why each project stage appears
-6. `course/<lang>/roadmap.md` — what to build and in what order
-7. `course/<lang>/milestones/NN-*.md` — project reconstruction, one causal stage at a time
-8. `course/<lang>/architecture.md` — how mature components cooperate (revisit after milestones)
-9. Write exercises and project code under `student/`; submit evidence to the tutor.
+1. `course/<lang>/readiness.md` — confirm your personalized starting point
+2. Open the current lesson under `course/<lang>/foundations/<unit>/` or `milestones/<unit>/`
+3. Do its first small action before reading the explanation
+4. Keep project work under `student/`; continue lesson by lesson
+5. Use `project-map.md` when locating a failure or technology layer
+6. Treat `project-evolution.md`, `knowledge-graph.md`, `architecture.md`, and `roadmap.md` as optional design/reference views, not required textbook chapters
+7. `course/design/` is machine-readable curriculum design data; learners normally do not read it
 
 Repository: {repository}
 """
@@ -38,7 +36,7 @@ Repository: {repository}
 
 def initial_progress(reference: Path, revision: str = "") -> dict:
     return {
-        "schema_version": 3,
+        "schema_version": 4,
         "repository": {
             "name": reference.name,
             "source": str(reference),
@@ -47,6 +45,7 @@ def initial_progress(reference: Path, revision: str = "") -> dict:
         "course_status": "analyzing",
         "learning_phase": "assessing",
         "current_unit": {"kind": "assessment", "id": "readiness"},
+        "current_lesson": None,
         "current_milestone": 0,
         "learner_profile": {
             "assessment_mode": "pending",
@@ -106,6 +105,8 @@ def initialize_workspace(reference: Path, output_root: Path, revision: str = "")
             )
 
     for relative in (
+        "course/design/foundations",
+        "course/design/milestones",
         "course/zh-CN/foundations",
         "course/en/foundations",
         "course/zh-CN/milestones",

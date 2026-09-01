@@ -19,6 +19,7 @@ Before localized rendering, create one language-neutral evolution model with:
 - `minimum_viable_start`: the smallest runnable V0 that provides observable value without the final architecture;
 - `stages`: ordered records containing `id`, `current_version`, `previous_value`, `new_problem`, `introduced_change`, `resolved_pressure`, `deferred_limit`, `next_pressure`, `source_bridge`, and typed evidence;
 - `practice_design`: for each foundation and milestone, `first_touch`, `manual_actions`, `ai_allowed`, `must_explain`, `transfer_check`, and `reappears_in`;
+- `lesson_design`: split each foundation into 1–3 and each milestone into 2–5 learner actions, each with exactly one cognitive goal, a situation, friction, action, observable result, minimum theory, project delta, next problem, and optional justified deferral;
 - `architecture_growth`: which responsibilities or boundaries appear only after their pressure becomes visible;
 - `route_disclaimer`: the evidence-backed statement that this is a teaching route rather than verified commit history.
 
@@ -32,7 +33,7 @@ Attach competency IDs and any required foundation IDs to the first milestone tha
 
 ## 3. Milestone quality contract
 
-Every milestone needs:
+Every milestone design needs:
 
 - one stable ID shared across languages;
 - a runnable, observable, or statically testable outcome;
@@ -45,13 +46,14 @@ Every milestone needs:
 - implementation tasks that leave design choices to the learner;
 - an explicit AI boundary: generated scaffolding allowed, critical manual actions/code, and required explanation;
 - a transfer or debugging check that changes one detail instead of repeating the demonstrated example;
-- concrete acceptance evidence, including direct practice evidence for passed schema-v3 units;
+- concrete acceptance evidence, including direct practice evidence for passed schema-v3+ units;
 - five progressively revealing hint levels;
+- 2–5 lesson definitions split by what the learner is doing and observing, never by API/function inventory;
 - the next pressure that motivates the following stage, using the same causal meaning as that following stage's new problem;
 - a source bridge to relevant mature-project files or symbols;
 - an evidence ledger and completion decision.
 
-Introduce an abstraction only when the learner has encountered the pressure it resolves. Avoid teaching a final architecture as ceremony. Recur important competencies rather than reteaching them: first touch the behavior, later explain it, diagnose it under failure, and finally transfer it to a changed context when the selected route justifies that depth.
+Introduce an abstraction only when the learner has encountered the pressure it resolves. Avoid teaching a final architecture as ceremony. After the route and dense unit designs are stable, read `learning-experience-renderer.md`; never render causal-field labels or evidence metadata directly into learner lessons. Recur important competencies rather than reteaching them: first touch the behavior, later explain it, diagnose it under failure, and finally transfer it to a changed context when the selected route justifies that depth.
 
 ## 4. Useful stage patterns
 
@@ -84,7 +86,7 @@ Revise the route when it:
 
 ## 6. Bilingual rendering
 
-Create a neutral stage record first. Render Chinese and English from that record. Pair files by identical filename and `artifact_id`. Keep code identifiers, repository paths, commands, configuration keys, API names, and protocol tokens unchanged. Translate explanation, pedagogy, constraints, and review language while preserving technical meaning.
+Create a neutral stage and lesson record first. Store dense unit records under `course/design/`, then use `learning-experience-renderer.md` to render paired lesson bundles. Core architecture, knowledge, evolution, and roadmap artifacts remain reference views rather than the learner's mandatory reading sequence. Render Chinese and English from that record. Pair files by identical filename and `artifact_id`. Keep code identifiers, repository paths, commands, configuration keys, API names, and protocol tokens unchanged. Translate explanation, pedagogy, constraints, and review language while preserving technical meaning.
 
 Render the neutral evolution model as paired `project-evolution.md` artifacts before rendering milestone prose. The artifact must show the mature problem, V0, stage overview, stage-by-stage causal chain, architecture growth, and the teaching-route disclaimer. It complements `roadmap.md`: the roadmap says what to build and in what order; project evolution explains why each stage exists.
 
